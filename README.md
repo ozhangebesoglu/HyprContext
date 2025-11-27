@@ -7,6 +7,64 @@
 ![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-purple)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
+## 📸 Ekran Görüntüleri
+
+<details>
+<summary>🖥️ Canlı Dashboard</summary>
+
+![Dashboard](docs/screenshots/dashboard.jpeg)
+
+</details>
+
+<details>
+<summary>📅 Günlük Plan (Obsidian)</summary>
+
+![Plan](docs/screenshots/plan_obsidian.jpeg)
+
+</details>
+
+<details>
+<summary>📝 Günlük Rapor (Obsidian)</summary>
+
+![Report](docs/screenshots/rapor_obsidian.jpeg)
+
+</details>
+
+<details>
+<summary>💬 Hafıza Sohbeti</summary>
+
+![Chat](docs/screenshots/chat.jpeg)
+
+</details>
+
+<details>
+<summary>⚡ Nasıl Çalışır (Loglar)</summary>
+
+![Logs](docs/screenshots/nasilcalisir.jpeg)
+
+</details>
+
+<details>
+<summary>🎯 Plan Oluşturma (Terminal)</summary>
+
+![Plan Terminal](docs/screenshots/planterminal.jpeg)
+
+</details>
+
+<details>
+<summary>📊 Rapor Oluşturma (Terminal)</summary>
+
+![Report Terminal](docs/screenshots/raporterminal.jpeg)
+
+</details>
+
+<details>
+<summary>🖥️ GPU Kullanımı</summary>
+
+![GPU](docs/screenshots/watchGPU.jpeg)
+
+</details>
+
 ## ✨ Özellikler
 
 - 🖥️ **Ekran Analizi**: Periyodik ekran görüntüsü alıp AI ile analiz eder
@@ -109,6 +167,26 @@ python daily_report.py
 ```bash
 python chat.py
 ```
+
+## ⌨️ Shell Alias'ları (Önerilen)
+
+`.bashrc` veya `.zshrc` dosyasına ekleyin:
+
+```bash
+# HyprContext Kısayolları
+alias baslat="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/main.py"
+alias chat="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/chat.py"
+alias rapor="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/daily_report.py"
+alias plan="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/planner.py"
+alias dashboard="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/dashboard.py"
+```
+
+Sonra:
+```bash
+source ~/.zshrc  # veya ~/.bashrc
+```
+
+Artık sadece `baslat`, `chat`, `rapor`, `plan`, `dashboard` yazarak kullanabilirsiniz!
 
 ## ⚙️ Systemd Servisi (Opsiyonel)
 
