@@ -1,0 +1,52 @@
+# === KİŞİSEL VERİLER (PAYLAŞILMAZ) ===
+# Konfigürasyon
+.env
+.env.local
+.env.*.local
+
+# Kullanıcı profili
+profile.yaml
+
+# Hafıza verileri
+history.jsonl
+hafiza_db/
+
+# Raporlar
+raporlar/
+
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# === IDE ===
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.cursor/
+
+# === EĞITIM (BÜYÜK DOSYALAR) ===
+Eğitim/ozhan-gemma-2b-lora/
+Eğitim/*.bin
+Eğitim/*.safetensors
+Eğitim/dataset.jsonl
+
+# === GEÇİCİ DOSYALAR ===
+*.log
+*.tmp
+/tmp/
+
+# === İŞLETİM SİSTEMİ ===
+.DS_Store
+Thumbs.db
+*.bak

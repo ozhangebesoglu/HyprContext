@@ -1,0 +1,69 @@
+# HyprContext Kullanıcı Profili Örneği
+# Bu dosyayı profile.yaml olarak kopyalayıp kendi bilgilerinizle doldurun
+# cp profile.yaml.example profile.yaml
+
+kullanici:
+  ad: "Ad Soyad"
+  dogum_yili: 2000
+  rol: "Yazılım Geliştirici"
+  genel_tanim: >
+    Kısa bir tanım yazın. Bu bilgi günlük plan oluştururken kullanılır.
+
+akademik_durum:
+  universite: "Üniversite Adı"
+  bolum: "Bölüm Adı"
+  sinif: 3
+  odak_dersler:
+    - "Ders 1"
+    - "Ders 2"
+    - "Ders 3"
+
+teknik_yetkinlikler:
+  backend:
+    - "Node.js"
+    - "Python"
+    - "PostgreSQL"
+  frontend:
+    - "React"
+    - "TypeScript"
+    - "TailwindCSS"
+  sistem:
+    - "Linux"
+    - "Docker"
+    - "Git"
+
+projeler:
+  aktif_projeler:
+    - ad: "Proje 1"
+      aciklama: "Proje açıklaması"
+    - ad: "Proje 2"
+      aciklama: "Proje açıklaması"
+
+ilgi_alanlari_genis:
+  yapay_zeka:
+    - "Makine Öğrenmesi"
+    - "NLP"
+  yazilim:
+    - "Full-stack geliştirme"
+    - "API tasarımı"
+
+hedefler:
+  kisa_vade:
+    - "Hedef 1"
+    - "Hedef 2"
+  uzun_vade:
+    - "Uzun vadeli hedef"
+
+# Eğitim programı (opsiyonel)
+# Planner bu bilgiyi kullanarak odaklanılacak konuyu belirler
+egitim_programi:
+  platform: "Udemy / Coursera / Scrimba"
+  yol: "Kurs Adı"
+  durum:
+    - isim: "Modül 1"
+      durum: "Tamamlandı"
+    - isim: "Modül 2"
+      durum: "Sırada (Aktif)"  # "Aktif" kelimesi önemli - planner bunu arar
+    - isim: "Modül 3"
+      durum: "Bekliyor"
+

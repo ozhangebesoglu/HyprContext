@@ -1,0 +1,21 @@
+# HyprContext Bağımlılıkları
+# pip install -r requirements.txt
+
+# AI & Embedding
+ollama>=0.3.0
+chromadb>=0.4.0
+
+# Terminal UI
+rich>=13.0.0
+
+# Web Dashboard
+streamlit>=1.30.0
+pandas>=2.0.0
+
+# Konfigürasyon
+python-dotenv>=1.0.0
+PyYAML>=6.0.0
+
+# Görsel İşleme (opsiyonel, grim kullanılıyor)
+Pillow>=10.0.0
+
