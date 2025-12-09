@@ -52,7 +52,9 @@ class OllamaAdapter(IAIClient):
             }
             
             if image:
-                kwargs["images"] = [image]
+                # Base64 bytes'ı string'e çevir
+                image_str = image.decode('utf-8') if isinstance(image, bytes) else image
+                kwargs["images"] = [image_str]
             
             response = ollama.generate(**kwargs)
             return response.get("response", "")

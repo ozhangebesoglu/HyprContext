@@ -37,15 +37,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Settings
+settings = get_settings()
 
-# Background task flag
+# Background task referansları
 _capture_task = None
 _focus_task = None
 
 
 async def capture_loop():
     """Ekran görüntüsü yakalama döngüsü."""
-    settings = get_settings()
     screenshot_capture = get_screenshot_capture()
     window_capture = get_window_capture()
     analyzer = get_analyzer_service()
@@ -139,16 +140,11 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("HyprContext Backend başlatılıyor...")
     
-    # Background task'ları başlat
-    _capture_task = asyncio.create_task(capture_loop())
-    _focus_task = asyncio.create_task(focus_loop())
-    
-    yield
+    yield  # Sunucu hazır
     
     # Shutdown
     logger.info("HyprContext Backend kapatılıyor...")
     
-    # Task'ları durdur
     if _capture_task:
         _capture_task.cancel()
     if _focus_task:
@@ -156,14 +152,28 @@ async def lifespan(app: FastAPI):
 
 
 # FastAPI uygulaması
-settings = get_settings()
-
 app = FastAPI(
     title=settings.app_name,
     description="Aktivite takip ve odak yönetim sistemi",
     version="0.1.0",
     lifespan=lifespan
 )
+
+
+# Startup event - background task'ları başlat
+@app.on_event("startup")
+async def start_background_tasks():
+    """Background task'ları sunucu hazır olduktan sonra başlat."""
+    global _capture_task, _focus_task
+    
+    # Biraz bekle
+    await asyncio.sleep(1)
+    
+    # Task'ları başlat (şimdilik devre dışı - test için)
+    # _capture_task = asyncio.create_task(capture_loop())
+    # _focus_task = asyncio.create_task(focus_loop())
+    logger.info("Background tasks hazır (devre dışı)")
+
 
 # CORS
 app.add_middleware(
