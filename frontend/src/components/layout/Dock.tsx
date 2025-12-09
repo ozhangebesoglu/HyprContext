@@ -1,7 +1,7 @@
 /**
  * Dock Navigation - Liquid Glass
  * ------------------------------
- * macOS dock tarzı navigasyon.
+ * macOS Sequoia tarzı dock navigasyonu.
  */
 
 import { NavLink } from 'react-router-dom';
@@ -18,33 +18,41 @@ const navItems = [
 
 export function Dock() {
   return (
-    <nav className="dock-container flex justify-center pb-4">
-      <div className="dock glass glass-heavy px-2 py-2 flex gap-1">
-        {navItems.map((item) => (
+    <nav className="dock-container flex justify-center pb-5">
+      <div className="dock flex gap-2">
+        {navItems.map((item, index) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
               clsx(
-                'dock-item relative p-3 rounded-xl transition-all duration-200',
-                'hover:bg-white/20 hover:scale-110',
-                isActive && 'bg-white/30 scale-105'
+                'dock-item relative p-3 rounded-xl',
+                'transition-all duration-300',
+                'hover:bg-white/30 dark:hover:bg-white/10',
+                isActive && 'bg-white/40 dark:bg-white/15 scale-105'
               )
             }
             title={item.label}
+            style={{ animationDelay: `${index * 0.05}s` }}
           >
             {({ isActive }) => (
               <>
                 <item.icon
                   size={24}
                   className={clsx(
-                    'transition-colors',
-                    isActive ? 'text-accent' : 'text-secondary'
+                    'transition-all duration-300',
+                    isActive 
+                      ? 'text-accent drop-shadow-lg' 
+                      : 'text-secondary hover:text-primary'
                   )}
+                  strokeWidth={isActive ? 2.5 : 2}
                 />
-                {/* Active indicator */}
+                {/* Active indicator dot */}
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
+                  <span 
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent shadow-lg"
+                    style={{ boxShadow: '0 0 8px var(--color-accent)' }}
+                  />
                 )}
               </>
             )}

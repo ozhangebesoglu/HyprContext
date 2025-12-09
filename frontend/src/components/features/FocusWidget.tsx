@@ -1,13 +1,13 @@
 /**
  * Focus Widget Component
  * ----------------------
- * Odak durumu göstergesi.
+ * Odak durumu göstergesi - Liquid Glass style.
  */
 
 import { GlassCard } from '../glass/GlassCard';
 import { useFocusStats } from '../../hooks/useApi';
 import { useFocusStore } from '../../stores/focusStore';
-import { Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Clock, AlertTriangle, CheckCircle, Zap } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export function FocusWidget() {
@@ -16,8 +16,15 @@ export function FocusWidget() {
 
   if (isLoading || !stats) {
     return (
-      <GlassCard className="p-4 animate-pulse">
-        <div className="h-32" />
+      <GlassCard className="p-5">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-white/20 rounded-lg w-1/2 shimmer" />
+          <div className="h-4 bg-white/10 rounded-full shimmer" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="h-16 bg-white/10 rounded-xl shimmer" />
+            <div className="h-16 bg-white/10 rounded-xl shimmer" />
+          </div>
+        </div>
       </GlassCard>
     );
   }
@@ -29,55 +36,70 @@ export function FocusWidget() {
   return (
     <GlassCard
       className={clsx(
-        'p-4 transition-all duration-300',
-        isDistracted && 'ring-2 ring-red-500/50'
+        'p-5 transition-all duration-500',
+        isDistracted && 'ring-2 ring-red-500/50 animate-pulse'
       )}
     >
-      <div className="flex items-center justify-between mb-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
         <h3 className="text-lg font-semibold text-primary flex items-center gap-2">
-          <Clock size={20} />
-          Odak Durumu
+          <div className="stat-icon">
+            <Clock size={20} />
+          </div>
+          <span>Odak Durumu</span>
         </h3>
-        {isDistracted ? (
-          <AlertTriangle className="text-red-500 animate-pulse" size={20} />
-        ) : (
-          <CheckCircle className="text-green-500" size={20} />
-        )}
+        <div className={clsx(
+          'p-2 rounded-full transition-all duration-300',
+          isDistracted 
+            ? 'bg-red-500/20 text-red-500 animate-pulse' 
+            : 'bg-green-500/20 text-green-500'
+        )}>
+          {isDistracted ? (
+            <AlertTriangle size={18} />
+          ) : (
+            <CheckCircle size={18} />
+          )}
+        </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+      <div className="mb-5">
+        <div className="progress-bar h-3">
           <div
             className={clsx(
-              'h-full rounded-full transition-all duration-500',
-              isDanger ? 'bg-red-500' :
-              isWarning ? 'bg-yellow-500' :
-              'bg-green-500'
+              'progress-fill h-full',
+              isDanger && '!bg-gradient-to-r !from-red-500 !to-red-400',
+              isWarning && !isDanger && '!bg-gradient-to-r !from-yellow-500 !to-yellow-400'
             )}
             style={{ width: `${percentage}%` }}
           />
         </div>
-        <div className="flex justify-between mt-1 text-xs text-muted">
-          <span>0</span>
-          <span>{Math.round(percentage)}%</span>
-          <span>100</span>
+        <div className="flex justify-between mt-2 text-xs text-muted">
+          <span>0%</span>
+          <span className={clsx(
+            'font-medium transition-colors',
+            isDanger && 'text-red-500',
+            isWarning && !isDanger && 'text-yellow-500'
+          )}>
+            {Math.round(percentage)}%
+          </span>
+          <span>100%</span>
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-sm text-muted">Kullanılan</p>
-          <p className="text-xl font-bold text-primary">
+        <div className="activity-item text-center">
+          <p className="text-xs text-muted mb-1">Kullanılan</p>
+          <p className="text-2xl font-bold text-primary">
             {stats.formatted_used}
           </p>
         </div>
-        <div>
-          <p className="text-sm text-muted">Kalan</p>
+        <div className="activity-item text-center">
+          <p className="text-xs text-muted mb-1">Kalan</p>
           <p className={clsx(
-            'text-xl font-bold',
-            isDanger ? 'text-red-500' : 'text-primary'
+            'text-2xl font-bold transition-colors',
+            isDanger ? 'text-red-500 glow-text' : 'text-primary'
           )}>
             {stats.formatted_remaining}
           </p>
@@ -86,9 +108,10 @@ export function FocusWidget() {
 
       {/* Warning Message */}
       {stats.limit_reached && (
-        <div className="mt-4 p-2 bg-red-500/20 rounded-lg">
-          <p className="text-sm text-red-500 text-center font-medium">
-            🛑 Günlük limit doldu!
+        <div className="mt-4 p-3 bg-red-500/20 rounded-xl border border-red-500/30 animate-scale-in">
+          <p className="text-sm text-red-500 text-center font-medium flex items-center justify-center gap-2">
+            <Zap size={16} className="animate-pulse" />
+            Günlük limit doldu!
           </p>
         </div>
       )}
