@@ -1,51 +1,287 @@
 # 🖥️ HyprContext Frontend Planı
 
-## 🎨 Renk Paleti
+## 🎨 Tema: Liquid Glass + Cashmere
 
-### Light Mode: Cashmere in Buff
+Tüm uygulama **Liquid Glass** (macOS Sequoia tarzı cam efekti) teması kullanacak. Kartlar, butonlar, modallar, sidebar'lar ve dock hepsi bu efekti kullanacak.
 
-| İsim | RGB | HEX | Kullanım |
-|------|-----|-----|----------|
-| Buff | rgb(85% 71% 59%) | `#D9B596` | Ana arka plan |
-| Cocoa | rgb(51.2% 28.2% 18.9%) | `#824830` | Metin, başlıklar |
-| Sienna | rgb(64.4% 39.4% 23.2%) | `#A4643B` | Accent, butonlar |
-| Taupe | rgb(68.4% 61.7% 54.3%) | `#AE9D8A` | İkincil metin, border |
-| Sand | rgb(84.8% 81% 74.8%) | `#D8CEBF` | Kart arka planı |
-| Cream | rgb(100% 98.7% 91.8%) | `#FFFCEA` | Vurgu, hover |
+### Renk Paleti: Cashmere
 
-### Dark Mode: Cashmere Night
-
+#### Light Mode
 | İsim | HEX | Kullanım |
 |------|-----|----------|
-| Charcoal | `#1a1612` | Ana arka plan |
-| Espresso | `#2d2420` | Kart arka planı |
-| Mocha | `#3d322a` | Hover, border |
-| Latte | `#A4643B` | Accent (aynı) |
-| Cream Text | `#E8DDD0` | Ana metin |
-| Muted | `#8B7B6B` | İkincil metin |
+| Buff | `#D9B596` | Arka plan (gradient/resim) |
+| Cocoa | `#824830` | Metin |
+| Sienna | `#A4643B` | Accent |
+| Glass Tint | `rgba(255, 255, 255, 0.5)` | Cam rengi |
+| Glass Border | `rgba(255, 255, 255, 0.3)` | Cam kenar |
 
-### Tema Değişkeni (CSS)
+#### Dark Mode
+| İsim | HEX | Kullanım |
+|------|-----|----------|
+| Charcoal | `#1a1612` | Arka plan |
+| Cream | `#E8DDD0` | Metin |
+| Sienna | `#A4643B` | Accent (aynı) |
+| Glass Tint | `rgba(26, 22, 18, 0.6)` | Cam rengi |
+| Glass Border | `rgba(255, 255, 255, 0.1)` | Cam kenar |
+
+### CSS Değişkenleri
 ```css
 :root {
   /* Light Mode */
   --bg-primary: #D9B596;
-  --bg-card: #D8CEBF;
-  --bg-hover: #FFFCEA;
-  --accent: #A4643B;
   --text-primary: #824830;
   --text-secondary: #AE9D8A;
-  --border: #AE9D8A;
+  --accent: #A4643B;
+  
+  /* Liquid Glass */
+  --glass-tint: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shine: rgba(255, 255, 255, 0.5);
+  --glass-shadow: rgba(0, 0, 0, 0.2);
+  --glass-blur: 20px;
 }
 
 [data-theme="dark"] {
   /* Dark Mode */
   --bg-primary: #1a1612;
-  --bg-card: #2d2420;
-  --bg-hover: #3d322a;
-  --accent: #A4643B;
   --text-primary: #E8DDD0;
   --text-secondary: #8B7B6B;
-  --border: #3d322a;
+  --accent: #A4643B;
+  
+  /* Liquid Glass - Dark */
+  --glass-tint: rgba(26, 22, 18, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shine: rgba(255, 255, 255, 0.15);
+  --glass-shadow: rgba(0, 0, 0, 0.4);
+  --glass-blur: 20px;
+}
+```
+
+---
+
+## 💎 Liquid Glass Tasarım Sistemi
+
+### Temel Prensip
+Uygulama arka planında bir **gradient veya resim** olacak. Tüm UI elementleri bu arka planın üzerinde **yarı saydam cam** gibi görünecek.
+
+### Arka Plan
+```css
+/* Light Mode - Gradient */
+body {
+  background: linear-gradient(135deg, #D9B596 0%, #E8DDD0 50%, #D9B596 100%);
+  /* Veya pattern/resim */
+  background-image: url('/assets/cashmere-pattern.png');
+  background-size: cover;
+}
+
+/* Dark Mode */
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, #1a1612 0%, #2d2420 50%, #1a1612 100%);
+}
+```
+
+### Glass Component Yapısı
+Her cam element 4 katmandan oluşur:
+
+```
+┌─────────────────────────────────────┐
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │  ← 1. Effect (blur + distortion)
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │  ← 2. Tint (renk katmanı)
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │  ← 3. Shine (ışık yansıması)
+│ ░░░░░░░  İÇERİK  ░░░░░░░░░░░░░░░░░ │  ← 4. Content (gerçek içerik)
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+└─────────────────────────────────────┘
+```
+
+### Glass Variants
+
+| Variant | Kullanım | Blur | Tint Opaklık |
+|---------|----------|------|--------------|
+| `glass-solid` | Kartlar, Sidebar | 20px | 0.5 |
+| `glass-light` | Butonlar, Tags | 10px | 0.3 |
+| `glass-heavy` | Modal, Dock | 30px | 0.6 |
+| `glass-subtle` | Hover states | 5px | 0.2 |
+
+---
+
+## 💎 Liquid Glass CSS Sistemi
+
+### Base Glass Component
+```css
+/* Base Liquid Glass */
+.glass {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 
+    0 8px 32px var(--glass-shadow),
+    inset 0 0 0 1px var(--glass-border);
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--glass-tint);
+  box-shadow: 
+    inset 2px 2px 4px 0 var(--glass-shine),
+    inset -1px -1px 2px 0 var(--glass-shine);
+}
+
+.glass > * {
+  position: relative;
+  z-index: 2;
+}
+```
+
+### Glass Variants
+```css
+/* Solid - Kartlar, Paneller */
+.glass-solid {
+  --glass-blur: 20px;
+  --glass-tint: rgba(255, 255, 255, 0.5);
+}
+[data-theme="dark"] .glass-solid {
+  --glass-tint: rgba(26, 22, 18, 0.6);
+}
+
+/* Light - Butonlar, Tags */
+.glass-light {
+  --glass-blur: 10px;
+  --glass-tint: rgba(255, 255, 255, 0.3);
+  border-radius: 0.5rem;
+}
+[data-theme="dark"] .glass-light {
+  --glass-tint: rgba(26, 22, 18, 0.4);
+}
+
+/* Heavy - Modal, Dock */
+.glass-heavy {
+  --glass-blur: 30px;
+  --glass-tint: rgba(255, 255, 255, 0.6);
+}
+[data-theme="dark"] .glass-heavy {
+  --glass-tint: rgba(26, 22, 18, 0.7);
+}
+
+/* Subtle - Hover */
+.glass-subtle {
+  --glass-blur: 5px;
+  --glass-tint: rgba(255, 255, 255, 0.2);
+}
+```
+
+### Glass Components
+
+```css
+/* Card */
+.glass-card {
+  @apply glass glass-solid;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px var(--glass-shadow),
+    inset 0 0 0 1px var(--glass-border);
+}
+
+/* Button */
+.glass-button {
+  @apply glass glass-light;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.glass-button:hover {
+  --glass-tint: rgba(255, 255, 255, 0.5);
+  transform: scale(1.02);
+}
+
+.glass-button:active {
+  transform: scale(0.98);
+}
+
+/* Button Primary (Accent) */
+.glass-button-primary {
+  @apply glass-button;
+  background: var(--accent);
+  color: white;
+}
+
+/* Sidebar */
+.glass-sidebar {
+  @apply glass glass-solid;
+  height: 100%;
+  border-radius: 0 1rem 1rem 0;
+}
+
+/* Modal */
+.glass-modal {
+  @apply glass glass-heavy;
+  max-width: 500px;
+  padding: 2rem;
+}
+
+/* Input */
+.glass-input {
+  @apply glass glass-light;
+  padding: 0.75rem 1rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.glass-input:focus {
+  box-shadow: 
+    0 0 0 2px var(--accent),
+    inset 0 0 0 1px var(--glass-border);
+}
+
+/* Tag */
+.glass-tag {
+  @apply glass glass-light;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 9999px;
+}
+
+/* Dock */
+.glass-dock {
+  @apply glass glass-heavy;
+  padding: 0.75rem;
+  border-radius: 2rem;
+}
+```
+
+### SVG Distortion Filter (Opsiyonel - Ekstra Efekt)
+```html
+<svg style="display: none">
+  <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="1" seed="5" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+
+/* Kullanım */
+.glass-distorted::before {
+  filter: url(#glass-distortion);
 }
 ```
 
@@ -81,34 +317,42 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│                        HyprContext                              │
-│                     ─────────────────                           │
-│                                                                 │
-│                  ┌─────────────────────┐                        │
-│                  │                     │                        │
-│                  │    ▶️  BAŞLAT       │   ← Büyük yuvarlak     │
-│                  │                     │     buton              │
-│                  └─────────────────────┘                        │
-│                                                                 │
-│                  ☐ Sistem ile otomatik başlat                   │
-│                                                                 │
-│           ┌─────────────────────────────────────┐               │
-│           │         📊 Bugünün Özeti            │               │
-│           ├─────────────────────────────────────┤               │
-│           │                                     │               │
-│           │  Kayıt      Süre       Odak        │               │
-│           │  ━━━━━      ━━━━━      ━━━━━       │               │
-│           │   142       4s 32dk     %78        │               │
-│           │                                     │               │
-│           │  Son aktivite: 2 dk önce           │               │
-│           │  "VS Code'da Python yazıyor"       │               │
-│           │                                     │               │
-│           └─────────────────────────────────────┘               │
-│                                                                 │
+│  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+│  ░░                                                         ░░ │
+│  ░░                    HyprContext                          ░░ │
+│  ░░                  ─────────────────                      ░░ │
+│  ░░                                                         ░░ │
+│  ░░           ╭─────────────────────────────╮               ░░ │
+│  ░░           │ ░░░░░░░░░░░░░░░░░░░░░░░░░░░ │               ░░ │
+│  ░░           │ ░░░                     ░░░ │               ░░ │
+│  ░░           │ ░░░    ▶️  BAŞLAT       ░░░ │  glass-button ░░ │
+│  ░░           │ ░░░                     ░░░ │               ░░ │
+│  ░░           │ ░░░░░░░░░░░░░░░░░░░░░░░░░░░ │               ░░ │
+│  ░░           ╰─────────────────────────────╯               ░░ │
+│  ░░                                                         ░░ │
+│  ░░                ☐ Sistem ile otomatik başlat             ░░ │
+│  ░░                                                         ░░ │
+│  ░░     ╭───────────────────────────────────────────╮       ░░ │
+│  ░░     │ ░░░░░░░░ 📊 Bugünün Özeti ░░░░░░░░░░░░░░░ │       ░░ │
+│  ░░     │ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │       ░░ │
+│  ░░     │ ░░  Kayıt      Süre       Odak       ░░░░ │       ░░ │
+│  ░░     │ ░░   142       4s 32dk     %78       ░░░░ │ glass ░░ │
+│  ░░     │ ░░                                   ░░░░ │ card  ░░ │
+│  ░░     │ ░░  Son aktivite: 2 dk önce          ░░░░ │       ░░ │
+│  ░░     │ ░░  "VS Code'da Python yazıyor"      ░░░░ │       ░░ │
+│  ░░     │ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │       ░░ │
+│  ░░     ╰───────────────────────────────────────────╯       ░░ │
+│  ░░                                                         ░░ │
+│  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
 ├─────────────────────────────────────────────────────────────────┤
-│  [🏠]    [📝]    [📊]    [📅]    [📄]    [⚙️]                  │
+│  ╭──────────────────────────────────────────────────────────╮  │
+│  │ ░░░ [🏠]    [📝]    [📊]    [📅]    [📄]    [⚙️] ░░░░░ │  │
+│  ╰──────────────────────────────────────────────────────────╯  │
+│                          glass-dock                             │
 └─────────────────────────────────────────────────────────────────┘
+
+Arka plan: Gradient veya pattern
+Tüm elementler: Liquid Glass efekti
 ```
 
 ---
@@ -716,29 +960,37 @@ const ConfirmReportModal = ({ isOpen, onClose, onConfirm, date, activityCount, i
 src/
 ├── components/
 │   │
+│   ├── glass/                    # 💎 Liquid Glass Primitives
+│   │   ├── GlassCard.tsx         # Temel cam kart
+│   │   ├── GlassButton.tsx       # Cam buton
+│   │   ├── GlassInput.tsx        # Cam input
+│   │   ├── GlassModal.tsx        # Cam modal
+│   │   ├── GlassTag.tsx          # Cam etiket
+│   │   ├── GlassSidebar.tsx      # Cam sidebar
+│   │   ├── GlassDock.tsx         # Cam dock
+│   │   └── GlassFilter.tsx       # SVG distortion filter
+│   │
 │   ├── layout/
-│   │   ├── Dock.tsx              # Alt navigasyon
+│   │   ├── AppLayout.tsx         # Ana layout (arka plan + dock)
 │   │   ├── PageContainer.tsx     # Sayfa wrapper
-│   │   └── Sidebar.tsx           # Planlar/Raporlar için
+│   │   └── SidebarLayout.tsx     # Sidebar'lı sayfa layout
 │   │
 │   ├── common/
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── Input.tsx
 │   │   ├── Slider.tsx
 │   │   ├── Dropdown.tsx
 │   │   ├── Checkbox.tsx
-│   │   ├── Modal.tsx
-│   │   ├── Tag.tsx               # Etiket badge
-│   │   └── Calendar.tsx          # Tarih seçici
+│   │   ├── Calendar.tsx
+│   │   ├── Toast.tsx
+│   │   └── LoadingSpinner.tsx
 │   │
 │   ├── features/
-│   │   ├── ActivityCard.tsx      # Aktivite kartı
-│   │   ├── PlanViewer.tsx        # Plan görüntüleyici
-│   │   ├── PlanEditor.tsx        # Plan düzenleyici (Markdown)
-│   │   ├── ReportViewer.tsx      # Rapor görüntüleyici
-│   │   ├── StatusIndicator.tsx   # Çalışıyor/Durdu
-│   │   ├── StatCard.tsx          # İstatistik kartı
+│   │   ├── ActivityCard.tsx      # glass-card kullanan
+│   │   ├── PlanViewer.tsx
+│   │   ├── PlanEditor.tsx        # Markdown editör
+│   │   ├── ReportViewer.tsx
+│   │   ├── ConfirmModal.tsx      # Onay modalı
+│   │   ├── StatusIndicator.tsx
+│   │   ├── StatCard.tsx
 │   │   └── charts/
 │   │       ├── ActivityChart.tsx
 │   │       ├── PieChart.tsx
@@ -751,6 +1003,101 @@ src/
 │       ├── Plans.tsx
 │       ├── Reports.tsx
 │       └── Settings.tsx
+│
+├── styles/
+│   ├── globals.css               # Temel stiller
+│   ├── glass.css                 # Liquid Glass sistemi
+│   └── themes.css                # Light/Dark tema
+```
+
+### Glass Component Örneği
+
+```tsx
+// components/glass/GlassCard.tsx
+import { ReactNode } from 'react';
+import clsx from 'clsx';
+
+interface GlassCardProps {
+  children: ReactNode;
+  variant?: 'solid' | 'light' | 'heavy' | 'subtle';
+  className?: string;
+  hover?: boolean;
+}
+
+export const GlassCard = ({ 
+  children, 
+  variant = 'solid', 
+  className,
+  hover = true 
+}: GlassCardProps) => {
+  return (
+    <div 
+      className={clsx(
+        'glass',
+        `glass-${variant}`,
+        hover && 'glass-hover',
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Kullanım
+<GlassCard variant="solid" className="p-6">
+  <h2>Bugünün Özeti</h2>
+  <p>142 kayıt</p>
+</GlassCard>
+```
+
+### App Layout (Arka Plan + Glass)
+
+```tsx
+// components/layout/AppLayout.tsx
+import { Outlet } from 'react-router-dom';
+import { GlassDock } from '../glass/GlassDock';
+import { GlassFilter } from '../glass/GlassFilter';
+
+export const AppLayout = () => {
+  return (
+    <div className="app-layout">
+      {/* SVG Filter (gizli) */}
+      <GlassFilter />
+      
+      {/* Arka plan */}
+      <div className="app-background" />
+      
+      {/* Sayfa içeriği */}
+      <main className="app-content">
+        <Outlet />
+      </main>
+      
+      {/* Dock */}
+      <GlassDock />
+    </div>
+  );
+};
+
+// CSS
+.app-layout {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  /* Veya pattern */
+}
+
+.app-content {
+  padding: 2rem;
+  padding-bottom: 100px; /* Dock için alan */
+}
 ```
 
 ---
@@ -961,13 +1308,22 @@ Normal (Durdu):     Aktif (Çalışıyor):
 
 ## 📋 Geliştirme Sırası
 
-### Faz 1: Temel Yapı (3-4 gün)
+### Faz 1: Temel Yapı + Glass System (4-5 gün)
 - [ ] Electron + Vite + React kurulumu
-- [ ] Tailwind + renk paleti (Light & Dark mode)
-- [ ] Liquid Glass CSS + SVG Filter
-- [ ] Dock komponenti (Liquid Glass)
+- [ ] Tailwind + CSS değişkenleri
+- [ ] **Liquid Glass Tasarım Sistemi:**
+  - [ ] glass.css (base styles)
+  - [ ] GlassCard.tsx
+  - [ ] GlassButton.tsx
+  - [ ] GlassInput.tsx
+  - [ ] GlassModal.tsx
+  - [ ] GlassTag.tsx
+  - [ ] GlassSidebar.tsx
+  - [ ] GlassDock.tsx
+  - [ ] GlassFilter.tsx (SVG)
+- [ ] AppLayout (arka plan + dock)
 - [ ] Tema toggle (Light/Dark)
-- [ ] Ana sayfa (statik)
+- [ ] Ana sayfa (glass componentlerle)
 
 ### Faz 2: API Entegrasyonu (3-4 gün)
 - [ ] API servisi (axios/fetch)
@@ -1031,12 +1387,29 @@ Normal (Durdu):     Aktif (Çalışıyor):
 
 | Karar | Seçim |
 |-------|-------|
-| Tema | Light (Cashmere) + Dark Mode |
-| Navigasyon | Dock (alt, Liquid Glass) |
+| **Ana Tema** | **Liquid Glass** (tüm uygulama) |
+| Renk Paleti | Cashmere (Light + Dark) |
+| Navigasyon | Dock (alt, glass-heavy) |
+| Kartlar | glass-solid |
+| Butonlar | glass-light |
+| Modallar | glass-heavy |
+| Sidebar | glass-solid |
 | Plan düzenleme | Markdown editör |
-| Rapor oluşturma | Onay modalı ile |
+| Rapor oluşturma | Onay modalı (glass-modal) |
 | Kapatma davranışı | Tray'e minimize |
-| Efekt | Liquid Glass (macOS Sequoia tarzı) |
+
+### Liquid Glass Hierarchy
+
+```
+Yoğunluk (Blur + Opacity)
+─────────────────────────────────────────►
+subtle (5px)  light (10px)  solid (20px)  heavy (30px)
+   │              │             │             │
+   ▼              ▼             ▼             ▼
+  Hover        Butonlar      Kartlar       Modal
+  States       Tags          Sidebar       Dock
+               Inputs        Paneller
+```
 
 ---
 
