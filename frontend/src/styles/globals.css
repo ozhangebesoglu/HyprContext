@@ -17,15 +17,15 @@
   --color-bg-primary: #e8ddd4;
   --color-bg-secondary: #f5f0eb;
   --color-bg-tertiary: #faf8f5;
-  
+
   --color-text-primary: #3d2a1e;
   --color-text-secondary: #6b4d38;
   --color-text-muted: #9a8578;
-  
+
   --color-accent: #a4643b;
   --color-accent-light: #c4956e;
   --color-accent-glow: rgba(164, 100, 59, 0.4);
-  
+
   /* Liquid Glass - Light */
   --glass-bg: linear-gradient(
     135deg,
@@ -51,7 +51,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --glass-blur: 24px;
   --glass-blur-heavy: 40px;
-  
+
   /* Spacing */
   --dock-height: 72px;
   --sidebar-width: 280px;
@@ -62,15 +62,15 @@
   --color-bg-primary: #1a1512;
   --color-bg-secondary: #252019;
   --color-bg-tertiary: #302820;
-  
+
   --color-text-primary: #f5f0eb;
   --color-text-secondary: #d4c8bc;
   --color-text-muted: #9a8578;
-  
+
   --color-accent: #c4956e;
   --color-accent-light: #d4a880;
   --color-accent-glow: rgba(196, 149, 110, 0.5);
-  
+
   /* Liquid Glass - Dark */
   --glass-bg: linear-gradient(
     135deg,
@@ -767,5 +767,19 @@ p {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+/*---break---
+ */
+@theme inline {
+  @keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-5px);
+    }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    }
   }
 }
