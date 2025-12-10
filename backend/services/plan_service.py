@@ -13,6 +13,7 @@ from typing import Optional
 from ..interfaces.ai_client import IAIClient
 from ..interfaces.repository import IPlanRepository, IActivityRepository
 from ..models.plan import Plan
+from .weather_service import WeatherService
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,8 @@ class PlanService:
         ai_client: IAIClient,
         plan_repository: IPlanRepository,
         activity_repository: IActivityRepository,
-        profile: dict
+        profile: dict,
+        weather_service: Optional[WeatherService] = None
     ):
         """
         Args:
@@ -33,11 +35,13 @@ class PlanService:
             plan_repository: Plan repository (DIP)
             activity_repository: Aktivite repository (DIP)
             profile: Kullanıcı profili
+            weather_service: Hava durumu servisi (opsiyonel)
         """
         self.ai_client = ai_client
         self.plan_repo = plan_repository
         self.activity_repo = activity_repository
         self.profile = profile
+        self.weather_service = weather_service
     
     def generate_plan(
         self,
@@ -61,6 +65,15 @@ class PlanService:
         if not active_course:
             active_course = self._get_active_course()
         
+        # Hava durumunu al (manuel verilmediyse otomatik)
+        if not weather and self.weather_service:
+            weather_data = self.weather_service.get_weather()
+            if weather_data:
+                weather = weather_data.to_string()
+        
+        if not weather:
+            weather = "Bilinmiyor"
+        
         # Son aktiviteleri al
         recent_activities = self.activity_repo.get_recent(limit=50)
         activity_summary = self._summarize_activities(recent_activities)
@@ -68,7 +81,7 @@ class PlanService:
         # Prompt oluştur
         prompt = self._create_prompt(
             today=today,
-            weather=weather or "Bilinmiyor",
+            weather=weather,
             user_note=user_note or "Yok",
             active_course=active_course,
             activity_summary=activity_summary

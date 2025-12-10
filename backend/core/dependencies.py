@@ -125,6 +125,18 @@ def get_report_repository():
     return ReportRepository(reports_dir=settings.reports_dir)
 
 
+def get_weather_service():
+    """Weather service bağımlılığı."""
+    from ..services.weather_service import WeatherService
+    settings = get_settings()
+    
+    # Profile'dan şehir al
+    profile = settings.get_profile()
+    location = profile.get("sehir", "Istanbul")
+    
+    return WeatherService(location=location)
+
+
 def get_plan_service():
     """Plan service bağımlılığı."""
     from ..services.plan_service import PlanService
@@ -134,7 +146,8 @@ def get_plan_service():
         ai_client=get_ai_client(),
         plan_repository=get_plan_repository(),
         activity_repository=get_activity_repository(),
-        profile=settings.get_profile()
+        profile=settings.get_profile(),
+        weather_service=get_weather_service()
     )
 
 

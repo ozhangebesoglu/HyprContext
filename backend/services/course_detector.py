@@ -8,12 +8,17 @@ Pencere başlığından Udemy, Coursera vb. platformları algılar.
 
 import re
 import logging
+import asyncio
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Callable
 from datetime import datetime, timedelta
+from pathlib import Path
+
+import yaml
 
 from ..interfaces.capture import IWindowCapture, WindowInfo
 from ..interfaces.notification import INotification, NotificationMessage, NotificationPriority
+from ..adapters.notification_adapter import DesktopNotification, InteractiveNotification
 
 logger = logging.getLogger(__name__)
 
@@ -192,6 +197,11 @@ class CourseDetectorService:
             logger.debug(f"Kurs bildirimi atlandı (cooldown): {course.name}")
             return False
         
+        # İnteraktif bildirim desteği var mı kontrol et
+        if isinstance(self.notification, DesktopNotification):
+            return self._send_interactive_notification(course)
+        
+        # Fallback: Normal bildirim
         message = NotificationMessage(
             title="📚 Kurs Tespit Edildi",
             body=f"'{course.name}' kursunu ({course.platform}) profilinize eklemek ister misiniz?",
@@ -202,11 +212,131 @@ class CourseDetectorService:
         success = self.notification.send(message)
         
         if success:
-            course_key = f"{course.platform}:{course.name}"
-            self._notified_courses[course_key] = datetime.now()
-            logger.info(f"Kurs bildirimi gönderildi: {course.name} ({course.platform})")
+            self._mark_notified(course)
         
         return success
+    
+    def _send_interactive_notification(self, course: DetectedCourse) -> bool:
+        """İnteraktif bildirim gönder (evet/hayır butonları ile)."""
+        try:
+            desktop_notif = self.notification
+            if hasattr(self.notification, 'notifications'):
+                # CompositeNotification ise, DesktopNotification'ı bul
+                for n in self.notification.notifications:
+                    if isinstance(n, DesktopNotification):
+                        desktop_notif = n
+                        break
+            
+            if not isinstance(desktop_notif, DesktopNotification):
+                return False
+            
+            interactive = InteractiveNotification(
+                title="📚 Kurs Tespit Edildi",
+                body=f"'{course.name}' ({course.platform})\n\nBu kursu profilinize eklemek ister misiniz?",
+                actions=[
+                    ("yes", "✅ Evet, Ekle"),
+                    ("no", "❌ Hayır")
+                ]
+            )
+            
+            # Async olarak çalıştır (blocking olmaması için)
+            asyncio.create_task(self._handle_interactive_response(
+                desktop_notif, interactive, course
+            ))
+            
+            self._mark_notified(course)
+            return True
+            
+        except Exception as e:
+            logger.error(f"İnteraktif bildirim hatası: {e}")
+            return False
+    
+    async def _handle_interactive_response(
+        self,
+        notif: DesktopNotification,
+        interactive: InteractiveNotification,
+        course: DetectedCourse
+    ) -> None:
+        """İnteraktif bildirim yanıtını işle."""
+        try:
+            # Thread'de çalıştır (blocking işlem)
+            loop = asyncio.get_event_loop()
+            action = await loop.run_in_executor(
+                None, 
+                lambda: notif.send_interactive(interactive, timeout=30000)
+            )
+            
+            if action == "yes":
+                # Kursu profile ekle
+                success = self._add_course_to_profile(course)
+                
+                if success:
+                    notif.send(NotificationMessage(
+                        title="✅ Kurs Eklendi",
+                        body=f"'{course.name}' profilinize eklendi.",
+                        priority=NotificationPriority.NORMAL,
+                        sound=False
+                    ))
+                    logger.info(f"Kurs profile eklendi: {course.name} ({course.platform})")
+                else:
+                    logger.error(f"Kurs eklenemedi: {course.name}")
+            else:
+                logger.info(f"Kurs reddedildi: {course.name}")
+                
+        except Exception as e:
+            logger.error(f"İnteraktif yanıt işleme hatası: {e}")
+    
+    def _add_course_to_profile(self, course: DetectedCourse) -> bool:
+        """Kursu profile.yaml dosyasına ekle."""
+        try:
+            from ..core.config import get_settings
+            settings = get_settings()
+            profile_path = Path(settings.profile_path)
+            
+            # Profili oku
+            if profile_path.exists():
+                with open(profile_path, "r", encoding="utf-8") as f:
+                    profile = yaml.safe_load(f) or {}
+            else:
+                profile = {}
+            
+            # egitim_programi yoksa oluştur
+            if "egitim_programi" not in profile:
+                profile["egitim_programi"] = {"durum": []}
+            if "durum" not in profile["egitim_programi"]:
+                profile["egitim_programi"]["durum"] = []
+            
+            # Kurs zaten var mı kontrol et
+            existing = profile["egitim_programi"]["durum"]
+            for c in existing:
+                if c.get("isim", "").lower() == course.name.lower():
+                    logger.info(f"Kurs zaten mevcut: {course.name}")
+                    return True
+            
+            # Yeni kurs ekle
+            new_course = {
+                "isim": course.name,
+                "platform": course.platform,
+                "durum": "Sırada (Aktif)",
+                "ekleme_tarihi": datetime.now().strftime("%Y-%m-%d")
+            }
+            profile["egitim_programi"]["durum"].append(new_course)
+            
+            # Kaydet
+            with open(profile_path, "w", encoding="utf-8") as f:
+                yaml.dump(profile, f, allow_unicode=True, default_flow_style=False)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Profile kurs ekleme hatası: {e}")
+            return False
+    
+    def _mark_notified(self, course: DetectedCourse) -> None:
+        """Kursu bildirildi olarak işaretle."""
+        course_key = f"{course.platform}:{course.name}"
+        self._notified_courses[course_key] = datetime.now()
+        logger.info(f"Kurs bildirimi gönderildi: {course.name} ({course.platform})")
     
     def clear_notification_cache(self) -> None:
         """Bildirim önbelleğini temizle."""

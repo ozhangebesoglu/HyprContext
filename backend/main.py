@@ -26,9 +26,16 @@ from .api.routes import (
     reports_router,
     focus_router,
     chat_router,
-    profile_router
+    profile_router,
+    control_router
 )
-from .api.websocket.handlers import websocket_endpoint, broadcast_activity, broadcast_focus_update
+from .api.websocket.handlers import (
+    websocket_endpoint, 
+    broadcast_activity, 
+    broadcast_focus_update,
+    broadcast_distraction_warning,
+    broadcast_system_stats
+)
 from .models.activity import Activity
 
 # Logging ayarları
@@ -44,6 +51,7 @@ settings = get_settings()
 # Background task referansları
 _capture_task = None
 _focus_task = None
+_system_monitor_task = None
 
 
 async def capture_loop():
@@ -122,11 +130,24 @@ async def focus_loop():
                 # Süreyi artır
                 data = focus_service.increment_distraction(seconds=1)
                 
-                # Uyarı kontrolü
-                focus_service.check_and_warn(data)
-                
-                # WebSocket ile broadcast et
+                # İstatistikleri al
                 stats = focus_service.get_stats()
+                
+                # Uyarı kontrolü ve WebSocket broadcast
+                warning_sent = focus_service.check_and_warn(data)
+                
+                if warning_sent:
+                    # Uyarı gönderildi - WebSocket'e de bildir
+                    await broadcast_distraction_warning({
+                        "keyword": keyword,
+                        "used_seconds": stats.used_seconds,
+                        "remaining_seconds": stats.remaining_seconds,
+                        "percentage": stats.percentage,
+                        "limit_reached": data.limit_reached,
+                        "message": f"Yasaklı uygulamalarda {stats.format_used()} geçirdin!"
+                    })
+                
+                # Normal durum güncellemesi
                 await broadcast_focus_update({
                     "is_distracted": True,
                     "keyword": keyword,
@@ -141,10 +162,35 @@ async def focus_loop():
         await asyncio.sleep(1)  # Her saniye kontrol
 
 
+async def system_monitor_loop():
+    """Sistem kaynak izleme döngüsü."""
+    from .services.system_monitor import SystemMonitorService
+    
+    monitor = SystemMonitorService()
+    
+    if not monitor.is_available():
+        logger.warning("System monitor kullanılamıyor (psutil kurulu değil)")
+        return
+    
+    logger.info("System monitor loop başlatıldı")
+    
+    while True:
+        try:
+            stats = monitor.get_stats()
+            
+            if stats:
+                await broadcast_system_stats(stats.to_dict())
+                
+        except Exception as e:
+            logger.error(f"System monitor hatası: {e}")
+        
+        await asyncio.sleep(2)  # Her 2 saniyede bir güncelle
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Uygulama yaşam döngüsü."""
-    global _capture_task, _focus_task
+    global _capture_task, _focus_task, _system_monitor_task
     
     # Startup
     logger.info("HyprContext Backend başlatılıyor...")
@@ -158,6 +204,8 @@ async def lifespan(app: FastAPI):
         _capture_task.cancel()
     if _focus_task:
         _focus_task.cancel()
+    if _system_monitor_task:
+        _system_monitor_task.cancel()
 
 
 # FastAPI uygulaması
@@ -173,7 +221,7 @@ app = FastAPI(
 @app.on_event("startup")
 async def start_background_tasks():
     """Background task'ları sunucu hazır olduktan sonra başlat."""
-    global _capture_task, _focus_task
+    global _capture_task, _focus_task, _system_monitor_task
     
     # Biraz bekle ki sunucu tamamen hazır olsun
     await asyncio.sleep(2)
@@ -181,6 +229,12 @@ async def start_background_tasks():
     # Background task'ları başlat
     _capture_task = asyncio.create_task(capture_loop())
     _focus_task = asyncio.create_task(focus_loop())
+    _system_monitor_task = asyncio.create_task(system_monitor_loop())
+    
+    # Control modülündeki durumu güncelle
+    from .api.routes.control import set_running_state
+    set_running_state(True)
+    
     logger.info("Background tasks başlatıldı")
 
 
@@ -200,6 +254,7 @@ app.include_router(reports_router, prefix="/api")
 app.include_router(focus_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(profile_router, prefix="/api")
+app.include_router(control_router, prefix="/api")
 
 # WebSocket
 app.websocket("/ws")(websocket_endpoint)

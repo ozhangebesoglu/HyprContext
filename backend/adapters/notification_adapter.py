@@ -9,14 +9,28 @@ Liskov Substitution: Tüm bildirim türleri INotification'ı implement eder.
 import subprocess
 import logging
 from pathlib import Path
+from typing import Optional, Callable
+from dataclasses import dataclass
 
 from ..interfaces.notification import INotification, NotificationMessage, NotificationPriority
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class InteractiveNotification:
+    """İnteraktif bildirim (action butonları ile)."""
+    title: str
+    body: str
+    actions: list[tuple[str, str]]  # [(action_id, label), ...]
+    callback: Optional[Callable[[str], None]] = None
+
+
 class DesktopNotification(INotification):
-    """Linux masaüstü bildirimi (notify-send)."""
+    """Linux masaüstü bildirimi (notify-send / dunstify)."""
+    
+    def __init__(self):
+        self._has_dunst = self._check_dunst()
     
     def send(self, message: NotificationMessage) -> bool:
         """Masaüstü bildirimi gönder."""
@@ -56,11 +70,89 @@ class DesktopNotification(INotification):
             logger.error(f"Bildirim hatası: {e}")
             return False
     
+    def send_interactive(
+        self, 
+        notification: InteractiveNotification,
+        timeout: int = 30000  # 30 saniye
+    ) -> Optional[str]:
+        """İnteraktif bildirim gönder ve yanıtı al.
+        
+        Args:
+            notification: İnteraktif bildirim
+            timeout: Bekleme süresi (ms)
+            
+        Returns:
+            Tıklanan action_id veya None (timeout/kapatıldı)
+        """
+        if self._has_dunst:
+            return self._send_dunst_interactive(notification, timeout)
+        else:
+            # Dunst yoksa normal bildirim gönder
+            self.send(NotificationMessage(
+                title=notification.title,
+                body=notification.body,
+                priority=NotificationPriority.NORMAL
+            ))
+            return None
+    
+    def _send_dunst_interactive(
+        self, 
+        notification: InteractiveNotification,
+        timeout: int
+    ) -> Optional[str]:
+        """Dunstify ile interaktif bildirim gönder."""
+        try:
+            cmd = [
+                "dunstify",
+                "-t", str(timeout),
+                "-u", "normal",
+            ]
+            
+            # Action'ları ekle
+            for action_id, label in notification.actions:
+                cmd.extend(["-A", f"{action_id},{label}"])
+            
+            cmd.extend([notification.title, notification.body])
+            
+            # Senkron çalıştır ve yanıtı al
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout // 1000 + 5  # Saniyeye çevir + buffer
+            )
+            
+            action = result.stdout.strip()
+            
+            if action and notification.callback:
+                notification.callback(action)
+            
+            return action if action else None
+            
+        except subprocess.TimeoutExpired:
+            logger.debug("İnteraktif bildirim timeout")
+            return None
+        except Exception as e:
+            logger.error(f"Dunstify hatası: {e}")
+            return None
+    
     def is_available(self) -> bool:
         """notify-send mevcut mu?"""
         try:
             subprocess.run(
                 ["which", "notify-send"],
+                capture_output=True,
+                check=True
+            )
+            return True
+        except Exception:
+            return False
+    
+    def _check_dunst(self) -> bool:
+        """dunstify mevcut mu?"""
+        try:
+            subprocess.run(
+                ["which", "dunstify"],
                 capture_output=True,
                 check=True
             )

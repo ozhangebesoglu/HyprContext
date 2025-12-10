@@ -111,6 +111,9 @@ class FocusService:
         self._save_today(data)
         return data
     
+    # Limit aşıldıktan sonra tekrar uyarı aralığı (saniye)
+    OVERTIME_WARNING_INTERVAL = 300  # 5 dakika
+    
     def check_and_warn(self, data: FocusData) -> bool:
         """Eşik kontrolü yap ve gerekirse uyarı gönder.
         
@@ -123,6 +126,7 @@ class FocusService:
         used = data.distraction_seconds
         remaining = max(0, self.daily_limit_seconds - used)
         
+        # Eşik bazlı uyarılar
         for threshold, label, is_voice in self.WARNING_THRESHOLDS:
             if used >= threshold and threshold > self._last_warning_threshold:
                 self._last_warning_threshold = threshold
@@ -145,6 +149,19 @@ class FocusService:
                     )
                 
                 self._save_today(data)
+                return True
+        
+        # Limit aşıldıktan sonra her 5 dakikada bir uyar
+        if data.limit_reached and used > self.daily_limit_seconds:
+            overtime = used - self.daily_limit_seconds
+            if overtime > 0 and overtime % self.OVERTIME_WARNING_INTERVAL == 0:
+                overtime_minutes = overtime // 60
+                self._send_warning(
+                    title="🛑 LİMİT AŞILDI!",
+                    body=f"Bugün toplam {self._format_duration(used)} harcadın.\nLimiti {overtime_minutes} dakika aştın!\nHemen işine dön!",
+                    priority=NotificationPriority.CRITICAL
+                )
+                logger.warning(f"Limit aşım uyarısı: +{overtime_minutes} dakika")
                 return True
         
         return False

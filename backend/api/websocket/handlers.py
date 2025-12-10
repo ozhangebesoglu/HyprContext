@@ -155,3 +155,12 @@ async def broadcast_plan_update(plan: dict):
         "data": plan,
         "timestamp": datetime.now().isoformat()
     })
+
+
+async def broadcast_system_stats(stats: dict):
+    """Sistem istatistiklerini broadcast et."""
+    await manager.broadcast({
+        "type": "system_stats",
+        "data": stats,
+        "timestamp": datetime.now().isoformat()
+    })
