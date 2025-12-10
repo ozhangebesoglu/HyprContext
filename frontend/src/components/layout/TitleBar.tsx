@@ -4,11 +4,13 @@
  * Frameless pencere için özel başlık çubuğu.
  */
 
-import { Moon, Sun, Minus, Square, X } from 'lucide-react';
+import { Moon, Sun, Minus, Square, X, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
+import { useSystemStore } from '../../stores/systemStore';
 
 export function TitleBar() {
   const { theme, toggleTheme } = useTheme();
+  const isConnected = useSystemStore((state) => state.isConnected);
   
   const handleMinimize = () => {
     window.electronAPI?.minimize();
@@ -25,8 +27,21 @@ export function TitleBar() {
   return (
     <div className="titlebar glass glass-subtle h-10 flex items-center justify-between px-4 -webkit-app-region-drag">
       {/* App Title */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <span className="text-sm font-semibold text-primary">HyprContext</span>
+        
+        {/* Connection Status */}
+        <div 
+          className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs ${
+            isConnected 
+              ? 'bg-green-500/20 text-green-500' 
+              : 'bg-red-500/20 text-red-400'
+          }`}
+          title={isConnected ? 'Bağlı' : 'Bağlantı kesildi'}
+        >
+          {isConnected ? <Wifi size={12} /> : <WifiOff size={12} />}
+          <span className="hidden sm:inline">{isConnected ? 'Çevrimiçi' : 'Çevrimdışı'}</span>
+        </div>
       </div>
       
       {/* Center - draggable area */}

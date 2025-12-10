@@ -5,7 +5,7 @@
  */
 
 import { NavLink } from 'react-router-dom';
-import { Home, MessageSquare, BarChart3, Calendar, FileText } from 'lucide-react';
+import { Home, MessageSquare, BarChart3, Calendar, FileText, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { path: '/graphs', icon: BarChart3, label: 'Grafikler' },
   { path: '/plans', icon: Calendar, label: 'Planlar' },
   { path: '/reports', icon: FileText, label: 'Raporlar' },
+  { path: '/settings', icon: Settings, label: 'Ayarlar' },
 ];
 
 export function Dock() {
