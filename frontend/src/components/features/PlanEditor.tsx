@@ -1,14 +1,15 @@
 /**
  * Plan Editor Component
  * ---------------------
- * Markdown plan editörü.
+ * Obsidian-style markdown plan editörü.
  */
 
 import { useState, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import { GlassButton } from '../ui/glass-button';
 import { useUpdatePlan } from '../../hooks/useApi';
-import { Save, Loader2 } from 'lucide-react';
+import { useTheme } from '../../hooks/useTheme';
+import { Save, Loader2, Eye, Edit3 } from 'lucide-react';
 
 interface PlanEditorProps {
   date: string;
@@ -18,7 +19,9 @@ interface PlanEditorProps {
 export function PlanEditor({ date, initialContent }: PlanEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [hasChanges, setHasChanges] = useState(false);
+  const [previewMode, setPreviewMode] = useState<'live' | 'edit' | 'preview'>('live');
   const updatePlan = useUpdatePlan();
+  const { theme } = useTheme();
 
   useEffect(() => {
     setContent(initialContent);
@@ -39,12 +42,51 @@ export function PlanEditor({ date, initialContent }: PlanEditorProps) {
   };
 
   return (
-    <div className="h-full flex flex-col" data-color-mode="light">
+    <div className="h-full flex flex-col plan-editor" data-color-mode={theme}>
       {/* Toolbar */}
       <div className="flex items-center justify-between p-2 border-b border-white/10">
-        <span className="text-sm text-muted">
-          {hasChanges ? '● Kaydedilmemiş değişiklikler' : '✓ Kaydedildi'}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted">
+            {hasChanges ? '● Kaydedilmemiş değişiklikler' : '✓ Kaydedildi'}
+          </span>
+          
+          {/* Mode Toggle */}
+          <div className="flex items-center gap-1 ml-4 p-1 rounded-lg bg-white/5">
+            <button
+              onClick={() => setPreviewMode('edit')}
+              className={`p-1.5 rounded-md transition-all ${
+                previewMode === 'edit' 
+                  ? 'bg-accent/20 text-accent' 
+                  : 'text-muted hover:text-primary'
+              }`}
+              title="Düzenleme Modu"
+            >
+              <Edit3 size={14} />
+            </button>
+            <button
+              onClick={() => setPreviewMode('live')}
+              className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${
+                previewMode === 'live' 
+                  ? 'bg-accent/20 text-accent' 
+                  : 'text-muted hover:text-primary'
+              }`}
+              title="Canlı Önizleme (Obsidian Tarzı)"
+            >
+              Live
+            </button>
+            <button
+              onClick={() => setPreviewMode('preview')}
+              className={`p-1.5 rounded-md transition-all ${
+                previewMode === 'preview' 
+                  ? 'bg-accent/20 text-accent' 
+                  : 'text-muted hover:text-primary'
+              }`}
+              title="Önizleme Modu"
+            >
+              <Eye size={14} />
+            </button>
+          </div>
+        </div>
         
         <GlassButton
           size="sm"
@@ -63,16 +105,14 @@ export function PlanEditor({ date, initialContent }: PlanEditorProps) {
       </div>
 
       {/* Editor */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden md-editor-container">
         <MDEditor
           value={content}
           onChange={handleChange}
           height="100%"
-          preview="edit"
-          hideToolbar={false}
-          style={{
-            backgroundColor: 'transparent',
-          }}
+          preview={previewMode}
+          hideToolbar={true}
+          visibleDragbar={false}
         />
       </div>
     </div>

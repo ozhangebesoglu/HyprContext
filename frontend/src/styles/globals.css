@@ -1060,3 +1060,247 @@ p {
 .glass-input-wrap:focus-within .glass-input-text-area::after {
   background-position: 25% 50%;
 }
+
+/* ==================== */
+/* Markdown Editor      */
+/* ==================== */
+
+.plan-editor {
+  --md-editor-bg: transparent;
+}
+
+/* Editor Container */
+.md-editor-container .w-md-editor {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Text Area */
+.md-editor-container .w-md-editor-text-pre,
+.md-editor-container .w-md-editor-text-input,
+.md-editor-container .w-md-editor-text {
+  color: var(--color-text-primary) !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+}
+
+/* Code/Pre styling */
+.md-editor-container .w-md-editor-text-pre > code {
+  color: var(--color-text-primary) !important;
+}
+
+/* Placeholder */
+.md-editor-container .w-md-editor-text-input::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+/* Preview Panel */
+.md-editor-container .w-md-editor-preview,
+.md-editor-container .wmde-markdown {
+  background: transparent !important;
+  color: var(--color-text-primary) !important;
+  padding: 16px !important;
+}
+
+/* Markdown Headings */
+.md-editor-container .wmde-markdown h1,
+.md-editor-container .wmde-markdown h2,
+.md-editor-container .wmde-markdown h3,
+.md-editor-container .wmde-markdown h4,
+.md-editor-container .wmde-markdown h5,
+.md-editor-container .wmde-markdown h6 {
+  color: var(--color-text-primary) !important;
+  border-bottom: 1px solid var(--glass-border-subtle);
+  padding-bottom: 0.5em;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.md-editor-container .wmde-markdown h1 {
+  font-size: 1.75em;
+  font-weight: 700;
+}
+
+.md-editor-container .wmde-markdown h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.md-editor-container .wmde-markdown h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+}
+
+/* Paragraphs */
+.md-editor-container .wmde-markdown p {
+  color: var(--color-text-secondary) !important;
+  margin-bottom: 1em;
+}
+
+/* Lists */
+.md-editor-container .wmde-markdown ul,
+.md-editor-container .wmde-markdown ol {
+  color: var(--color-text-secondary) !important;
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.md-editor-container .wmde-markdown li {
+  margin-bottom: 0.25em;
+}
+
+/* Checkbox Lists - Obsidian Style */
+.md-editor-container .wmde-markdown li input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-accent);
+  border-radius: 4px;
+  margin-right: 8px;
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+}
+
+.md-editor-container .wmde-markdown li input[type="checkbox"]:checked {
+  background: var(--color-accent);
+}
+
+.md-editor-container .wmde-markdown li input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Blockquotes */
+.md-editor-container .wmde-markdown blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--color-text-muted) !important;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75em 1em;
+}
+
+/* Code Blocks */
+.md-editor-container .wmde-markdown pre {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 8px !important;
+  padding: 1em !important;
+  margin: 1em 0 !important;
+  overflow-x: auto;
+}
+
+.md-editor-container .wmde-markdown code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.9em;
+}
+
+.md-editor-container .wmde-markdown :not(pre) > code {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: var(--color-accent) !important;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+/* Links */
+.md-editor-container .wmde-markdown a {
+  color: var(--color-accent) !important;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color-accent);
+}
+
+.md-editor-container .wmde-markdown a:hover {
+  border-bottom-style: solid;
+}
+
+/* Horizontal Rule */
+.md-editor-container .wmde-markdown hr {
+  border: none;
+  height: 1px;
+  background: var(--glass-border);
+  margin: 2em 0;
+}
+
+/* Tables */
+.md-editor-container .wmde-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.md-editor-container .wmde-markdown th,
+.md-editor-container .wmde-markdown td {
+  border: 1px solid var(--glass-border);
+  padding: 0.5em 1em;
+  text-align: left;
+}
+
+.md-editor-container .wmde-markdown th {
+  background: rgba(99, 102, 241, 0.1);
+  font-weight: 600;
+}
+
+/* Strong & Emphasis */
+.md-editor-container .wmde-markdown strong {
+  color: var(--color-text-primary) !important;
+  font-weight: 600;
+}
+
+.md-editor-container .wmde-markdown em {
+  color: var(--color-text-secondary) !important;
+  font-style: italic;
+}
+
+/* Live Mode - Syntax Highlighting */
+.md-editor-container .w-md-editor-text-pre .title,
+.md-editor-container .token.title {
+  color: var(--color-accent) !important;
+  font-weight: 600;
+}
+
+.md-editor-container .w-md-editor-text-pre .bold,
+.md-editor-container .token.bold {
+  font-weight: 600;
+}
+
+.md-editor-container .w-md-editor-text-pre .italic,
+.md-editor-container .token.italic {
+  font-style: italic;
+}
+
+.md-editor-container .w-md-editor-text-pre .url,
+.md-editor-container .token.url {
+  color: var(--color-accent) !important;
+}
+
+.md-editor-container .w-md-editor-text-pre .list,
+.md-editor-container .token.list {
+  color: var(--color-accent) !important;
+}
+
+/* Scrollbar */
+.md-editor-container .w-md-editor-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border) transparent;
+}
+
+/* Split View Divider */
+.md-editor-container .w-md-editor-bar {
+  background: var(--glass-border) !important;
+}
+
+/* Dark mode specific */
+.dark .md-editor-container .w-md-editor-text-pre > code,
+.dark .md-editor-container .w-md-editor-text-input {
+  color: var(--color-text-primary) !important;
+}
