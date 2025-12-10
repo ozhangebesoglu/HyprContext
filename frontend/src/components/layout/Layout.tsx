@@ -6,7 +6,6 @@
 
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Dock } from './Dock';
-import { TitleBar } from './TitleBar';
 import MacOSMenuBar from '../ui/mac-os-menu-bar';
 
 export function Layout() {
@@ -53,11 +52,8 @@ export function Layout() {
 
   return (
     <div className="layout h-full flex flex-col">
-      {/* Custom Title Bar with Window Controls */}
-      <TitleBar />
-      
-      {/* macOS Style Menu Bar */}
-      <div className="px-3 py-1.5">
+      {/* macOS Style Menu Bar (includes traffic lights & theme) */}
+      <div className="px-3 pt-2 pb-1 -webkit-app-region-drag">
         <MacOSMenuBar onMenuAction={handleMenuAction} />
       </div>
       
