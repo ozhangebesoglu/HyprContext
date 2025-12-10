@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import { GlassButton } from '../glass/GlassButton';
+import { GlassButton } from '../ui/glass-button';
 import { useUpdatePlan } from '../../hooks/useApi';
 import { Save, Loader2 } from 'lucide-react';
 
@@ -51,12 +51,14 @@ export function PlanEditor({ date, initialContent }: PlanEditorProps) {
           onClick={handleSave}
           disabled={!hasChanges || updatePlan.isPending}
         >
-          {updatePlan.isPending ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <Save size={16} />
-          )}
-          <span className="ml-1">Kaydet</span>
+          <span className="flex items-center gap-1.5">
+            {updatePlan.isPending ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Save size={14} />
+            )}
+            Kaydet
+          </span>
         </GlassButton>
       </div>
 

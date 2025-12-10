@@ -6,9 +6,10 @@
 
 import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/glass/GlassCard';
-import { GlassButton } from '../components/glass/GlassButton';
+import { GlassButton } from '../components/ui/glass-button';
+import { GlassInput } from '../components/ui/glass-input';
 import { 
-  Settings, User, Bell, Shield, Database, 
+  Settings, User, Shield, 
   Save, Loader2, Plus, X, Clock, BookOpen
 } from 'lucide-react';
 
@@ -106,13 +107,15 @@ export function SettingsPage() {
           <p className="text-secondary mt-1">Uygulama ve profil ayarları</p>
         </div>
         
-        <GlassButton onClick={saveProfile} disabled={saving}>
-          {saving ? (
-            <Loader2 size={18} className="animate-spin mr-2" />
-          ) : (
-            <Save size={18} className="mr-2" />
-          )}
-          Kaydet
+        <GlassButton onClick={saveProfile} disabled={saving} size="sm">
+          <span className="flex items-center gap-2">
+            {saving ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Save size={16} />
+            )}
+            Kaydet
+          </span>
         </GlassButton>
       </header>
 
@@ -127,32 +130,27 @@ export function SettingsPage() {
               <h3 className="text-lg font-semibold text-primary">Profil</h3>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-muted block mb-2">İsim</label>
-                <input
-                  type="text"
-                  value={profile?.user?.name || ''}
-                  onChange={(e) => setProfile(profile ? {
-                    ...profile,
-                    user: { ...profile.user, name: e.target.value }
-                  } : null)}
-                  className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-primary focus:outline-none focus:border-accent/50 transition-colors"
-                />
-              </div>
+            <div className="space-y-5">
+              <GlassInput
+                label="İsim"
+                icon={<User size={18} />}
+                value={profile?.user?.name || ''}
+                onChange={(e) => setProfile(profile ? {
+                  ...profile,
+                  user: { ...profile.user, name: e.target.value }
+                } : null)}
+                placeholder="İsminizi girin..."
+              />
               
-              <div>
-                <label className="text-sm text-muted block mb-2">Meslek</label>
-                <input
-                  type="text"
-                  value={profile?.user?.profession || ''}
-                  onChange={(e) => setProfile(profile ? {
-                    ...profile,
-                    user: { ...profile.user, profession: e.target.value }
-                  } : null)}
-                  className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-primary focus:outline-none focus:border-accent/50 transition-colors"
-                />
-              </div>
+              <GlassInput
+                label="Meslek"
+                value={profile?.user?.profession || ''}
+                onChange={(e) => setProfile(profile ? {
+                  ...profile,
+                  user: { ...profile.user, profession: e.target.value }
+                } : null)}
+                placeholder="Mesleğinizi girin..."
+              />
             </div>
           </GlassCard>
         </div>
@@ -168,25 +166,21 @@ export function SettingsPage() {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="text-sm text-muted block mb-2">
-                  Günlük Dikkat Dağınıklığı Limiti (dakika)
-                </label>
-                <input
-                  type="number"
-                  value={profile?.daily_limits?.distraction_minutes || 120}
-                  onChange={(e) => setProfile(profile ? {
-                    ...profile,
-                    daily_limits: { 
-                      ...profile.daily_limits, 
-                      distraction_minutes: parseInt(e.target.value) || 120 
-                    }
-                  } : null)}
-                  className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-primary focus:outline-none focus:border-accent/50 transition-colors"
-                />
-              </div>
+              <GlassInput
+                label="Günlük Dikkat Dağınıklığı Limiti (dakika)"
+                icon={<Clock size={18} />}
+                type="number"
+                value={profile?.daily_limits?.distraction_minutes || 120}
+                onChange={(e) => setProfile(profile ? {
+                  ...profile,
+                  daily_limits: { 
+                    ...profile.daily_limits, 
+                    distraction_minutes: parseInt(e.target.value) || 120 
+                  }
+                } : null)}
+              />
               
-              <p className="text-xs text-muted">
+              <p className="text-xs text-muted pl-3">
                 Yasaklı uygulamalarda bu süreyi aştığınızda uyarı alırsınız.
               </p>
             </div>
@@ -205,16 +199,14 @@ export function SettingsPage() {
 
             <div className="space-y-4">
               {/* Add new keyword */}
-              <div className="flex gap-2">
-                <input
-                  type="text"
+              <div className="flex gap-3 items-end">
+                <GlassInput
                   value={newKeyword}
                   onChange={(e) => setNewKeyword(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && addBannedKeyword()}
                   placeholder="Yeni kelime ekle..."
-                  className="flex-1 p-3 rounded-xl bg-white/10 border border-white/20 text-primary placeholder-muted focus:outline-none focus:border-accent/50 transition-colors"
                 />
-                <GlassButton onClick={addBannedKeyword}>
+                <GlassButton onClick={addBannedKeyword} size="icon">
                   <Plus size={18} />
                 </GlassButton>
               </div>
@@ -229,7 +221,7 @@ export function SettingsPage() {
                     {keyword}
                     <button
                       onClick={() => removeBannedKeyword(keyword)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500"
                     >
                       <X size={12} />
                     </button>

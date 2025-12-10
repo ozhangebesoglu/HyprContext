@@ -5,7 +5,7 @@
  */
 
 import { GlassCard } from '../glass/GlassCard';
-import { GlassButton } from '../glass/GlassButton';
+import { GlassButton } from '../ui/glass-button';
 import { useTodayPlan, useGeneratePlan } from '../../hooks/useApi';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Target, Loader2, Plus } from 'lucide-react';
@@ -36,13 +36,16 @@ export function TodayPlan() {
           <GlassButton
             onClick={() => generatePlan.mutate({})}
             disabled={generatePlan.isPending}
+            size="sm"
           >
-            {generatePlan.isPending ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <Plus size={18} />
-            )}
-            <span className="ml-2">Plan Oluştur</span>
+            <span className="flex items-center gap-2">
+              {generatePlan.isPending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Plus size={16} />
+              )}
+              Plan Oluştur
+            </span>
           </GlassButton>
         </div>
       </GlassCard>

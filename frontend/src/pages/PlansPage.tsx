@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { GlassCard } from '../components/glass/GlassCard';
-import { GlassButton } from '../components/glass/GlassButton';
+import { GlassButton } from '../components/ui/glass-button';
 import { PlanEditor } from '../components/features/PlanEditor';
 import { PlanList } from '../components/features/PlanList';
 import { useGeneratePlan, useTodayPlan, usePlan } from '../hooks/useApi';
@@ -34,14 +34,17 @@ export function PlansPage() {
           <GlassButton
             onClick={handleGeneratePlan}
             disabled={generatePlan.isPending}
-            className="flex-1 py-3"
+            className="flex-1"
+            size="sm"
           >
-            {generatePlan.isPending ? (
-              <Loader2 size={18} className="animate-spin mr-2" />
-            ) : (
-              <Wand2 size={18} className="mr-2" />
-            )}
-            Yeni Plan Oluştur
+            <span className="flex items-center gap-2">
+              {generatePlan.isPending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Wand2 size={16} />
+              )}
+              Yeni Plan Oluştur
+            </span>
           </GlassButton>
         </div>
         

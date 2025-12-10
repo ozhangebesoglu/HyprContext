@@ -7,6 +7,7 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Dock } from './Dock';
 import MacOSMenuBar from '../ui/mac-os-menu-bar';
+import { NeonOrbs } from '../ui/neon-orbs';
 
 export function Layout() {
   const navigate = useNavigate();
@@ -52,6 +53,9 @@ export function Layout() {
 
   return (
     <div className="layout h-full flex flex-col">
+      {/* Animated Neon Orbs Background */}
+      <NeonOrbs />
+      
       {/* macOS Style Menu Bar (includes traffic lights & theme) */}
       <div className="px-3 pt-2 pb-1 -webkit-app-region-drag">
         <MacOSMenuBar onMenuAction={handleMenuAction} />

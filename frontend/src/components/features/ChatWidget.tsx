@@ -6,7 +6,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { GlassCard } from '../glass/GlassCard';
-import { GlassButton } from '../glass/GlassButton';
+import { GlassButton } from '../ui/glass-button';
+import { GlassInput } from '../ui/glass-input';
 import { useChat } from '../../hooks/useApi';
 import { Send, Bot, User, Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -101,19 +102,18 @@ export function ChatWidget() {
 
       {/* Input */}
       <div className="p-4 border-t border-white/10">
-        <div className="flex gap-2">
-          <input
-            type="text"
+        <div className="flex gap-3 items-end">
+          <GlassInput
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Mesajınızı yazın..."
-            className="flex-1 p-3 rounded-xl bg-white/10 border border-white/20 text-primary placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent/50"
             disabled={chat.isPending}
           />
           <GlassButton
             onClick={handleSend}
             disabled={!input.trim() || chat.isPending}
+            size="icon"
           >
             <Send size={18} />
           </GlassButton>

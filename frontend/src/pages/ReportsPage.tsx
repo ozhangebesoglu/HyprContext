@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { GlassCard } from '../components/glass/GlassCard';
-import { GlassButton } from '../components/glass/GlassButton';
+import { GlassButton } from '../components/ui/glass-button';
 import { GlassModal } from '../components/glass/GlassModal';
 import { ReportList } from '../components/features/ReportList';
 import { ReportViewer } from '../components/features/ReportViewer';
@@ -49,14 +49,16 @@ export function ReportsPage() {
         <GlassButton
           onClick={handleGenerateClick}
           disabled={generateReport.isPending}
-          className="py-3"
+          size="sm"
         >
-          {generateReport.isPending ? (
-            <Loader2 size={18} className="animate-spin mr-2" />
-          ) : (
-            <FileText size={18} className="mr-2" />
-          )}
-          Bugünü Raporla
+          <span className="flex items-center gap-2">
+            {generateReport.isPending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <FileText size={16} />
+            )}
+            Bugünü Raporla
+          </span>
         </GlassButton>
         
         {/* Report List with FileTree */}
@@ -90,10 +92,12 @@ export function ReportsPage() {
             {selectedDate && (
               <GlassButton
                 onClick={() => setShowExportModal(true)}
-                title="Obsidian'a Aktar"
+                size="sm"
               >
-                <FileOutput size={18} className="mr-2" />
-                Aktar
+                <span className="flex items-center gap-2">
+                  <FileOutput size={16} />
+                  Aktar
+                </span>
               </GlassButton>
             )}
           </div>
@@ -143,14 +147,16 @@ export function ReportsPage() {
           
           <div className="flex justify-end gap-3">
             <GlassButton
-              variant="subtle"
               onClick={() => setShowConfirmModal(false)}
+              size="sm"
             >
               İptal
             </GlassButton>
-            <GlassButton onClick={handleConfirmGenerate}>
-              <FileText size={16} className="mr-2" />
-              Raporla
+            <GlassButton onClick={handleConfirmGenerate} size="sm">
+              <span className="flex items-center gap-2">
+                <FileText size={14} />
+                Raporla
+              </span>
             </GlassButton>
           </div>
         </div>
@@ -167,27 +173,31 @@ export function ReportsPage() {
             Rapor belirtilen dizine Markdown dosyası olarak kaydedilecek.
           </p>
           
-          <div className="space-y-2">
-            <label className="text-sm text-muted">Kayıt Dizini</label>
-            <input
-              type="text"
-              value={exportPath}
-              onChange={(e) => setExportPath(e.target.value)}
-              className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-primary placeholder-muted focus:outline-none focus:border-accent/50 transition-colors"
-              placeholder="/home/user/Obsidian/Vault/Raporlar/"
-            />
+          <div className="glass-input-wrap w-full">
+            <div className="glass-input">
+              <span className="glass-input-text-area"></span>
+              <input
+                type="text"
+                value={exportPath}
+                onChange={(e) => setExportPath(e.target.value)}
+                className="relative z-10 h-full w-full bg-transparent text-primary placeholder:text-primary/50 focus:outline-none py-3 px-4"
+                placeholder="/home/user/Obsidian/Vault/Raporlar/"
+              />
+            </div>
           </div>
           
           <div className="flex justify-end gap-3 mt-6">
             <GlassButton
-              variant="subtle"
               onClick={() => setShowExportModal(false)}
+              size="sm"
             >
               İptal
             </GlassButton>
-            <GlassButton onClick={handleExport}>
-              <Download size={16} className="mr-2" />
-              Aktar
+            <GlassButton onClick={handleExport} size="sm">
+              <span className="flex items-center gap-2">
+                <Download size={14} />
+                Aktar
+              </span>
             </GlassButton>
           </div>
         </div>
