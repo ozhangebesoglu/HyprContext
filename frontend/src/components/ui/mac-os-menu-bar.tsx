@@ -356,12 +356,12 @@ const MacOSMenuBar: React.FC<MacOSMenuBarProps> = ({
               onClick={handleAppleMenuClick}
               className="cursor-pointer hover:opacity-80 transition-opacity duration-150 flex items-center space-x-2"
             >
-              {/* HyprContext Icon */}
-              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" stroke="white" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
+              {/* HyprContext Icon - Transparent */}
+              <svg width="16" height="16" viewBox="0 0 24 24" className="text-amber-400">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity="0.9"/>
+                <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+                <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
+              </svg>
               <span className="text-white text-sm font-semibold">{appName}</span>
             </div>
 
@@ -381,12 +381,14 @@ const MacOSMenuBar: React.FC<MacOSMenuBarProps> = ({
           </div>
 
           {/* Right section - connection, theme, clock */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             {/* Connection Status */}
             <ConnectionStatus />
 
             {/* Theme Switcher */}
-            <CinematicThemeSwitcher size="sm" />
+            <div className="mx-1">
+              <CinematicThemeSwitcher size="xs" />
+            </div>
 
             {/* Clock */}
             <span

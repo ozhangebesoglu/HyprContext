@@ -10,7 +10,7 @@ interface Particle {
 }
 
 interface CinematicThemeSwitcherProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
 export default function CinematicThemeSwitcher({ size = 'md' }: CinematicThemeSwitcherProps) {
@@ -29,7 +29,8 @@ export default function CinematicThemeSwitcher({ size = 'md' }: CinematicThemeSw
 
   // Size configurations
   const sizes = {
-    sm: { container: 'h-8 w-14', thumb: 'h-6 w-6', translate: 22, icon: 12, px: 'px-2' },
+    xs: { container: 'h-5 w-9', thumb: 'h-3.5 w-3.5', translate: 14, icon: 8, px: 'px-1' },
+    sm: { container: 'h-6 w-11', thumb: 'h-4 w-4', translate: 18, icon: 10, px: 'px-1.5' },
     md: { container: 'h-10 w-[68px]', thumb: 'h-7 w-7', translate: 28, icon: 14, px: 'px-2.5' },
     lg: { container: 'h-[64px] w-[104px]', thumb: 'h-[44px] w-[44px]', translate: 46, icon: 20, px: 'px-4' },
   };
