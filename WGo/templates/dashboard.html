@@ -1,0 +1,151 @@
+{{define "content"}}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold" style="color: var(--text-primary)">📊 Dashboard</h1>
+            <p style="color: var(--text-muted)" class="mt-1">Aktivite özeti ve canlı istatistikler</p>
+        </div>
+        <button onclick="location.reload()" class="btn btn-secondary">
+            🔄 Yenile
+        </button>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="stat-card">
+            <div style="color: var(--text-muted)" class="text-sm mb-2">Toplam Kayıt</div>
+            <div class="stat-number">{{if .Stats}}{{.Stats.TotalRecords}}{{else}}0{{end}}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div style="color: var(--text-muted)" class="text-sm mb-2">Bugün</div>
+            <div class="stat-number">{{if .Stats}}{{.Stats.TodayRecords}}{{else}}0{{end}}</div>
+        </div>
+        
+        <div class="stat-card col-span-2">
+            <div class="flex justify-between items-center mb-4">
+                <div style="color: var(--text-muted)" class="text-sm">Odak Takibi</div>
+                {{if .Focus.limit_reached}}
+                <span class="tag tag-danger">🛑 LİMİT AŞILDI</span>
+                {{else}}
+                <span class="tag" style="background: rgba(74, 124, 89, 0.1); color: var(--success)">✓ Aktif</span>
+                {{end}}
+            </div>
+            
+            <div class="flex items-end gap-4 mb-4">
+                <div>
+                    <span class="text-3xl font-bold" style="color: var(--accent)">{{.Focus.formatted_used}}</span>
+                    <span style="color: var(--text-muted)" class="text-sm"> kullanıldı</span>
+                </div>
+                <div style="color: var(--text-muted)">
+                    <span class="text-xl font-semibold" style="color: var(--text-secondary)">{{.Focus.formatted_remaining}}</span>
+                    <span class="text-sm"> kaldı</span>
+                </div>
+            </div>
+            
+            <div class="progress-bg h-3">
+                <div class="progress-bar h-3" style="width: {{printf "%.1f" .Focus.percentage}}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Aktivite Akışı -->
+        <div class="lg:col-span-2 card p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="section-title">📋 Son Aktiviteler</h2>
+                <a href="/activities" class="text-sm hover:underline" style="color: var(--accent)">Tümünü Gör →</a>
+            </div>
+            
+            <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {{if .Recent}}
+                {{range .Recent}}
+                <div class="activity-item py-3">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="font-mono text-sm" style="color: var(--text-muted)">{{.Time}}</span>
+                        <span class="tag">{{.Tags}}</span>
+                    </div>
+                    <p class="text-sm" style="color: var(--text-secondary)">{{.Summary}}</p>
+                </div>
+                {{end}}
+                {{else}}
+                <div class="text-center py-12" style="color: var(--text-muted)">
+                    <p class="text-4xl mb-4">📭</p>
+                    <p>Henüz kayıt yok</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Hızlı Erişim -->
+            <div class="card p-6">
+                <h3 class="section-title mb-4">⚡ Hızlı Erişim</h3>
+                <div class="space-y-3">
+                    <a href="/planner" class="quick-link block">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">📅</span>
+                            <div>
+                                <div class="font-medium" style="color: var(--text-primary)">Günlük Plan</div>
+                                <div class="text-xs" style="color: var(--text-muted)">AI ile plan oluştur</div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="/chat" class="quick-link block">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">💬</span>
+                            <div>
+                                <div class="font-medium" style="color: var(--text-primary)">Hafıza Chat</div>
+                                <div class="text-xs" style="color: var(--text-muted)">Geçmişe sor</div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="/analytics" class="quick-link block">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">📈</span>
+                            <div>
+                                <div class="font-medium" style="color: var(--text-primary)">Analitik</div>
+                                <div class="text-xs" style="color: var(--text-muted)">Grafikler</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bilgiler -->
+            <div class="card p-6">
+                <h3 class="section-title mb-4">ℹ️ Bilgiler</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span style="color: var(--text-muted)">İlk Kayıt</span>
+                        <span class="font-mono" style="color: var(--text-secondary)">{{if .Stats}}{{.Stats.OldestDate}}{{else}}-{{end}}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color: var(--text-muted)">Son Kayıt</span>
+                        <span class="font-mono" style="color: var(--text-secondary)">{{if .Stats}}{{.Stats.NewestDate}}{{else}}-{{end}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yasaklı -->
+            <div class="card p-6">
+                <h3 class="section-title mb-4">🚫 Yasaklı</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tag tag-danger">youtube</span>
+                    <span class="tag tag-danger">instagram</span>
+                    <span class="tag tag-danger">twitter</span>
+                    <span class="tag tag-danger">reddit</span>
+                    <span class="tag tag-danger">netflix</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+setTimeout(() => location.reload(), 30000);
+</script>
+{{end}}

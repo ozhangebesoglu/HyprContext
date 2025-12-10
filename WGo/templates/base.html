@@ -1,0 +1,280 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} | HyprContext</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Ana palet */
+            --color-1: #3f2525;
+            --color-2: #431020;
+            --color-3: #622b34;
+            --color-4: #8d534b;
+            --color-5: #bc816c;
+            --color-6: #d4cac4;
+            
+            /* Arka plan - krem */
+            --bg-primary: #d4cac4;
+            --bg-secondary: #c9bdb6;
+            --bg-card: #f5f0ed;
+            
+            /* Yazı - profesyonel koyu (tam siyah değil) */
+            --text-primary: #2d2424;
+            --text-secondary: #5a4a4a;
+            --text-muted: #7d6b6b;
+            
+            /* Accent renkler */
+            --accent: #622b34;
+            --accent-light: #8d534b;
+            --accent-dark: #431020;
+            
+            /* Diğer */
+            --border: rgba(63, 37, 37, 0.15);
+            --shadow: rgba(63, 37, 37, 0.1);
+            --danger: #a83232;
+            --success: #4a7c59;
+        }
+        
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-4) var(--bg-secondary);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--color-2) 0%, var(--color-1) 100%);
+            color: var(--color-6);
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+        
+        .nav-link {
+            color: rgba(212, 202, 196, 0.7);
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-6);
+            background: rgba(212, 202, 196, 0.1);
+        }
+        
+        .nav-link.active {
+            color: var(--color-6);
+            background: var(--color-3);
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(67, 16, 32, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--color-6);
+        }
+        
+        .input {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            width: 100%;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(98, 43, 52, 0.1);
+        }
+        
+        .tag {
+            background: rgba(98, 43, 52, 0.1);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .tag-danger {
+            background: rgba(168, 50, 50, 0.1);
+            color: var(--danger);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--color-4) 0%, var(--color-5) 100%);
+            border-radius: 999px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-bg {
+            background: var(--border);
+            border-radius: 999px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .activity-item {
+            border-left: 3px solid var(--accent);
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+        }
+        
+        .activity-item:hover {
+            background: rgba(98, 43, 52, 0.03);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .live-indicator { animation: pulse 2s infinite; }
+        
+        .section-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        
+        .markdown h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary); }
+        .markdown h2 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--accent); }
+        .markdown ul { list-style: disc; margin-left: 1.5rem; }
+        .markdown li { margin: 0.25rem 0; }
+        .markdown p { margin: 0.5rem 0; }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .quick-link {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .quick-link:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 h-screen sticky top-0 p-4 flex flex-col">
+        <div class="mb-8">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <span class="text-2xl">🧠</span>
+                <span>HyprContext</span>
+            </h1>
+            <p class="text-xs opacity-60 mt-1">AI Hafıza Ajanı</p>
+        </div>
+        
+        <nav class="flex-1 space-y-1">
+            <a href="/" class="nav-link {{if eq .Page "dashboard"}}active{{end}}">
+                <span>📊</span> Dashboard
+            </a>
+            <a href="/activities" class="nav-link {{if eq .Page "activities"}}active{{end}}">
+                <span>📋</span> Aktiviteler
+            </a>
+            <a href="/analytics" class="nav-link {{if eq .Page "analytics"}}active{{end}}">
+                <span>📈</span> Analitik
+            </a>
+            <a href="/planner" class="nav-link {{if eq .Page "planner"}}active{{end}}">
+                <span>📅</span> Planlayıcı
+            </a>
+            <a href="/chat" class="nav-link {{if eq .Page "chat"}}active{{end}}">
+                <span>💬</span> Hafıza Chat
+            </a>
+        </nav>
+        
+        <div class="pt-4 border-t border-white/10">
+            <div class="flex items-center gap-2 text-xs opacity-60">
+                <span class="w-2 h-2 rounded-full live-indicator" style="background: #4a7c59"></span>
+                <span class="font-mono">{{.Timestamp}}</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-auto">
+        {{block "content" .}}{{end}}
+    </main>
+</body>
+</html>
+{{end}}

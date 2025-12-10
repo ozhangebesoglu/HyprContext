@@ -1,0 +1,218 @@
+kullanici:
+  ad: "Özhan Gebeşoğlu"
+  dogum_yili: 2002
+  rol: "Bilisim Sistemleri ve Teknolojileri öğrencisi, full-stack geliştirici, girişimci"
+  genel_tanim: >
+    Teknolojiye erken yaşta ilgi duymuş, yapay zekâ ve sistem tasarımına doğal yatkınlığı olan,
+    proje odaklı çalışan, bağımsız üretim kapasitesi yüksek bir geliştirici. Kendi ekosistemini
+    kurmaya çalışan, yazılım ve donanım ilişkisini birlikte değerlendirebilen, üretken ve deneysel
+    öğrenme stiline sahip.
+
+akademik_durum:
+  universite: "Mersin Üniversitesi"
+  bolum: "Bilisim Sistemleri ve Teknolojileri"
+  sinif: 3
+  ders_programi_kaynak: "DersTakvimi.pdf"
+  odak_dersler:
+    - "Bilgisayar Mimarisi"
+    - "Yazılım Modellemesi ve Proje Yönetimi"
+    - "Bilgisayar Grafikleri"
+    - "Nesneye Yönelik Programlama"
+    - "Veri Analizi"
+  katilimi_esnek_dersler:
+    - "Matematik I"
+    - "Olasılık ve İstatistik"
+    - "Mantık Devreleri"
+    - "Genel Muhasebe I"
+
+teknik_yetkinlikler:
+  backend:
+    - "Node.js"
+    - "NestJS"
+    - "TypeScript"
+    - "PostgreSQL"
+    - "TypeORM"
+    - "JWT"
+    - "API Tasarımı"
+  frontend:
+    - "React"
+    - "TypeScript"
+    - "Vite"
+    - "TailwindCSS"
+    - "Zustand"
+    - "React Query"
+  mobil:
+    - "Flutter"
+    - "Dart"
+  sistem:
+    - "Linux"
+    - "Arch"
+    - "Hyprland"
+    - "Shell scripting"
+    - "PipeWire"
+  veri_ve_yapay_zeka:
+    - "SVM"
+    - "Regresyon modelleri"
+    - "Veri temizleme"
+    - "Model eğitimi"
+  diger:
+    - "UI/UX tasarımı"
+    - "Minimal tasarım prensipleri"
+    - "Donanım-yazılım entegrasyonu"
+
+projeler:
+  aktif_projeler:
+    - ad: "BAM Platformu"
+      aciklama: >
+        Haber ve içerik yönetimi — React + NestJS tabanlı kurumsal bir platform. Admin panel,
+        RBAC, analytics, makale yönetimi ve gelir takibi içerir.
+    - ad: "ButcherTrack"
+      aciklama: >
+        Kasaplar için geliştirilen finans, stok, gelir-gider ve ürün takibi uygulaması.
+        Flutter + Dart tabanlı mobil uygulama; ileride SaaS modeli hedefleniyor.
+    - ad: "Kişisel Yapay Zeka Asistanı"
+      aciklama: >
+        Kullanıcının günlük rutinini öğrenen, bilgisayar ekranını analiz eden, görev oluşturan,
+        çalışma tarzını modelleyen yapay zekâ projesi. Hedef: kişiyi tanıyan tam kişisel AI.
+    - ad: "Günlük Defteri"
+      aciklama: "Kişisel günlük tutma uygulaması."
+    - ad: "Faturamatik"
+      aciklama: "Fatura takip web uygulaması."
+
+ilgi_alanlari_genis:
+  yapay_zeka:
+    - "Kişisel asistan modelleri"
+    - "Davranış analizi"
+    - "Alışkanlık madenciliği"
+    - "Kişisel profil modelleme"
+  yazilim:
+    - "Full-stack mimari"
+    - "Offline-first uygulamalar"
+    - "Dağıtık sistemler"
+    - "Gerçek zamanlı veri işleme"
+  sistem:
+    - "Linux özelleştirme"
+    - "Donanım optimizasyonu"
+    - "Terminal iş akışı"
+  tasarim:
+    - "Minimal UI"
+    - "Simge (icon) tasarımı"
+    - "Karanlık tema uyumluluğu"
+  akademik_merak:
+    - "Mikroişlemciler"
+    - "Mantıksal devre tasarımı"
+    - "İstatistiksel analiz"
+    - "Matematiksel modelleme"
+
+davranis_kaliplari:
+  ogrenme_stili:
+    - "Proje temelli öğrenme"
+    - "Dene-yanıl yöntemi"
+    - "Araştırma yoğun modlar"
+    - "Dokümantasyon üzerinden öğrenme"
+    - "Teoriyi pratikle ilişkilendirerek pekiştirme"
+  calisma_tarzi:
+    - "İlgisini çeken konuda saatlerce odaklanabilir"
+    - "İlgisini çekmeyen konuya hızlı sıkılır"
+    - "Tek başına yüksek üretkenlik"
+    - "Kendi tempisini belirler"
+    - "Problem çözmede agresif hız"
+    - "Tool-asistan destekli çalışma"
+    - "Çoklu proje yürütme eğilimi"
+  karar_verme:
+    - "Hızlı analiz"
+    - "Sonuç odaklı"
+    - "Deneysel"
+    - "Verimlilik öncelikli"
+
+sevmedikleri:
+  calisma_ortami:
+    - "Yavaş bilgisayar"
+    - "Optimizasyon eksikliği"
+    - "Boş konuşma"
+    - "Ezbere dayalı eğitim"
+    - "Kuru teori"
+    - "Verimsiz ders"
+  insanlar:
+    - "Aşırı yavaş ilerleyen kişiler"
+    - "Özgüven kırıcı tutum"
+  yazilim:
+    - "Dağınık mimari"
+    - "Dokümantasyonsuz kod"
+    - "Kötü UI"
+
+hedefler:
+  kisa_vade:
+    - "AI tabanlı kişisel asistanı tamamlamak"
+    - "BAM platformunu büyütmek"
+    - "ButcherTrack’i satışa uygun ürün haline getirmek"
+    - "Kendi yazılım ekosistemini oluşturmak"
+  orta_vade:
+    - "AI engineer seviyesine ulaşmak"
+    - "Flutter + web + backend üçlüsünde derin uzmanlık"
+    - "Küçük SaaS ürünleri geliştirip gelir elde etmek"
+  uzun_vade:
+    - "Kendi yerli yapay zekâ modelini geliştirmek"
+    - "Birden fazla teknoloji projesini markaya dönüştürmek"
+    - "Topluluk odaklı öğrenme platformu kurmak"
+    - "Başkanlık hedefi doğrultusunda teknoloji vizyonu oluşturmak"
+
+kisisel_ozellikler:
+  karakter:
+    - "Analitik"
+    - "Sessiz ama gözlemci"
+    - "Yaratıcı"
+    - "Risk almaya yatkın"
+    - "Teknolojiye takıntılı"
+  davranis:
+    - "Sorun görünce çözmeden duramaz"
+    - "Kendi araç ekosistemini kurmaya eğilimli"
+    - "Sıkılınca anında konu değiştirir"
+  motivasyon_kaynaklari:
+    - "Başarma hazzı"
+    - "Yeni bir sistem kurma"
+    - "Optimizasyon"
+    - "Hız"
+    - "Özgür çalışma"
+
+egitim_programi:
+  platform: "Scrimba"
+  yol: "Full Stack Developer Path"
+  durum:
+    - isim: "Introduction"
+      durum: "Tamamlandı"
+    - isim: "HTML and CSS Fundamentals"
+      durum: "Tamamlandı (%96)"
+    - isim: "JavaScript Fundamentals" # ŞU AN BURADASIN
+      sure: "8.5 saat"
+      durum: "Sırada (Aktif)"
+    - isim: "Tools of the Trade"
+      sure: "2.2 saat"
+      durum: "Bekliyor"
+    - isim: "Accessible Development"
+      sure: "1.5 saat"
+      durum: "Bekliyor"
+    - isim: "Essential CSS"
+      sure: "4.4 saat"
+      durum: "Bekliyor"
+    - isim: "Essential JavaScript"
+      sure: "10.4 saat"
+      durum: "Bekliyor"
+    - isim: "Responsive Design"
+      sure: "4.6 saat"
+      durum: "Bekliyor"
+    - isim: "APIs and Async JavaScript"
+      sure: "7.6 saat"
+      durum: "Bekliyor"
+    - isim: "AI Engineering"
+      sure: "5.2 saat"
+      durum: "Bekliyor"
+    - isim: "Node.js & Databases & Express"
+      sure: "10.3 saat"
+      durum: "Bekliyor"
+    - isim: "React.js Fundamentals"
+      sure: "15.3 saat"
+      durum: "Bekliyor"
+    - isim: "Advanced React.js"
+      sure: "16.4 saat"
+      durum: "Bekliyor"

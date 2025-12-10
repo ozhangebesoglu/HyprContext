@@ -1,0 +1,120 @@
+{{define "content"}}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold" style="color: var(--text-primary)">📅 Günlük Planlayıcı</h1>
+        <p style="color: var(--text-muted)" class="mt-1">AI destekli kişiselleştirilmiş günlük plan</p>
+    </div>
+
+    <!-- Plan Generator -->
+    <div class="card p-6 mb-6">
+        <h2 class="section-title mb-4">🎯 Yeni Plan Oluştur</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm mb-2" style="color: var(--text-muted)">Bugünkü Notun (opsiyonel)</label>
+                <input type="text" id="planNote" class="input" placeholder="Örn: Bugün React öğreneceğim...">
+            </div>
+            
+            <div>
+                <label class="block text-sm mb-2" style="color: var(--text-muted)">Profil Bilgisi (opsiyonel)</label>
+                <textarea id="planProfile" class="input h-24" placeholder="Örn: Yazılım geliştiriciyim..."></textarea>
+            </div>
+            
+            <button onclick="generatePlan()" class="btn btn-primary w-full" id="generateBtn">
+                ✨ Plan Oluştur
+            </button>
+        </div>
+    </div>
+
+    <!-- Generated Plan -->
+    <div class="card p-6" id="planContainer" style="display: none;">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="section-title">📋 Günün Planı</h2>
+            <div class="flex gap-2">
+                <button onclick="copyPlan()" class="btn btn-secondary text-sm">📋 Kopyala</button>
+                <button onclick="downloadPlan()" class="btn btn-secondary text-sm">📥 İndir</button>
+            </div>
+        </div>
+        <div id="planContent" class="markdown"></div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingContainer" class="card p-12 text-center" style="display: none;">
+        <div class="loading mx-auto mb-4"></div>
+        <p style="color: var(--text-muted)">Plan oluşturuluyor...</p>
+    </div>
+
+    <!-- Recent Logs -->
+    <div class="card p-6 mt-6">
+        <h2 class="section-title mb-4">📚 Geçmiş Aktiviteler</h2>
+        <p class="text-sm mb-4" style="color: var(--text-muted)">Son aktiviteler plan oluştururken dikkate alınır.</p>
+        
+        <div class="space-y-2 max-h-[250px] overflow-y-auto">
+            {{range .RecentLogs}}
+            <div class="flex items-center gap-3 p-2 rounded" style="background: var(--bg-secondary)">
+                <span class="font-mono text-xs" style="color: var(--text-muted)">{{.Date}} {{.Time}}</span>
+                <span class="text-sm truncate" style="color: var(--text-secondary)">{{.Summary}}</span>
+            </div>
+            {{else}}
+            <p class="text-center py-4" style="color: var(--text-muted)">Henüz aktivite kaydı yok</p>
+            {{end}}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+let generatedPlan = '';
+
+async function generatePlan() {
+    const note = document.getElementById('planNote').value;
+    const profile = document.getElementById('planProfile').value;
+    const btn = document.getElementById('generateBtn');
+    const loading = document.getElementById('loadingContainer');
+    const container = document.getElementById('planContainer');
+    
+    btn.disabled = true;
+    btn.textContent = 'Oluşturuluyor...';
+    loading.style.display = 'block';
+    container.style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/plan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note, profile })
+        });
+        const data = await response.json();
+        
+        if (data.error) {
+            alert('Hata: ' + data.error);
+            return;
+        }
+        
+        generatedPlan = data.plan;
+        document.getElementById('planContent').innerHTML = marked.parse(data.plan);
+        container.style.display = 'block';
+    } catch (error) {
+        alert('Bağlantı hatası: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Plan Oluştur';
+        loading.style.display = 'none';
+    }
+}
+
+function copyPlan() {
+    navigator.clipboard.writeText(generatedPlan);
+    alert('Kopyalandı!');
+}
+
+function downloadPlan() {
+    const blob = new Blob([generatedPlan], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Plan_${new Date().toISOString().split('T')[0]}.md`;
+    a.click();
+}
+</script>
+{{end}}

@@ -1,0 +1,112 @@
+{{define "content"}}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold" style="color: var(--text-primary)">📈 Analitik</h1>
+            <p style="color: var(--text-muted)" class="mt-1">Aktivite analizleri ve grafikler</p>
+        </div>
+        <div class="flex gap-3">
+            <input type="date" id="dateFilter" class="input w-auto" value="{{.Today}}">
+            <button onclick="updateCharts()" class="btn btn-primary">Güncelle</button>
+        </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="card p-6">
+            <h2 class="section-title mb-4">⏰ Saatlik Aktivite</h2>
+            <canvas id="hourlyChart" height="200"></canvas>
+        </div>
+
+        <div class="card p-6">
+            <h2 class="section-title mb-4">🏷️ Konu Dağılımı</h2>
+            <canvas id="tagChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Focus Stats -->
+    <div class="card p-6 mb-6">
+        <h2 class="section-title mb-4">🎯 Odak Analizi</h2>
+        <div class="grid grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="stat-number">{{.Focus.formatted_used}}</div>
+                <div style="color: var(--text-muted)">Dikkat Dağıtıcı</div>
+            </div>
+            <div class="text-center">
+                <div class="stat-number">{{.Focus.formatted_remaining}}</div>
+                <div style="color: var(--text-muted)">Kalan Süre</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl font-bold" style="{{if gt .Focus.percentage 75.0}}color: var(--danger){{else if gt .Focus.percentage 50.0}}color: var(--color-4){{else}}color: var(--success){{end}}">
+                    {{printf "%.0f" .Focus.percentage}}%
+                </div>
+                <div style="color: var(--text-muted)">Kullanım</div>
+            </div>
+        </div>
+        <div class="mt-6 progress-bg h-4">
+            <div class="progress-bar h-4" style="width: {{printf "%.1f" .Focus.percentage}}%"></div>
+        </div>
+    </div>
+
+    <!-- Top Tags -->
+    <div class="card p-6">
+        <h2 class="section-title mb-4">🔥 En Aktif Konular</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {{range $tag, $count := .Tags}}
+            <div class="stat-card text-center">
+                <div class="text-2xl font-bold" style="color: var(--accent)">{{$count}}</div>
+                <div class="text-sm truncate" style="color: var(--text-muted)">{{$tag}}</div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+
+<script>
+const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+new Chart(hourlyCtx, {
+    type: 'bar',
+    data: {
+        labels: Array.from({length: 24}, (_, i) => i + ':00'),
+        datasets: [{
+            label: 'Aktivite',
+            data: {{.HourlyData}},
+            backgroundColor: 'rgba(98, 43, 52, 0.6)',
+            borderColor: 'rgba(98, 43, 52, 1)',
+            borderWidth: 1,
+            borderRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#5a4a4a' } },
+            x: { grid: { display: false }, ticks: { color: '#5a4a4a', maxRotation: 0 } }
+        }
+    }
+});
+
+const tagCtx = document.getElementById('tagChart').getContext('2d');
+new Chart(tagCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {{.TagLabels}},
+        datasets: [{
+            data: {{.TagData}},
+            backgroundColor: ['#622b34', '#8d534b', '#bc816c', '#3f2525', '#431020', '#d4cac4'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'right', labels: { color: '#2d2424', padding: 15 } } }
+    }
+});
+
+function updateCharts() {
+    window.location.href = '/analytics?date=' + document.getElementById('dateFilter').value;
+}
+</script>
+{{end}}

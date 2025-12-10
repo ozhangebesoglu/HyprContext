@@ -1,0 +1,87 @@
+{{define "content"}}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold" style="color: var(--text-primary)">📋 Aktiviteler</h1>
+            <p style="color: var(--text-muted)" class="mt-1">Tüm aktivite kayıtları</p>
+        </div>
+        <div class="flex gap-3">
+            <input type="date" id="dateFilter" class="input w-auto" value="{{.Today}}">
+            <button onclick="filterByDate()" class="btn btn-secondary">Filtrele</button>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="mb-6">
+        <div class="relative">
+            <input type="text" id="searchInput" class="input pl-12" placeholder="Aktivitelerde ara...">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2" style="color: var(--text-muted)">🔍</span>
+        </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="stat-card text-center">
+            <div class="text-2xl font-bold" style="color: var(--accent)">{{if .Stats}}{{.Stats.TotalRecords}}{{else}}0{{end}}</div>
+            <div class="text-xs" style="color: var(--text-muted)">Toplam</div>
+        </div>
+        <div class="stat-card text-center">
+            <div class="text-2xl font-bold" style="color: var(--accent-light)">{{if .Stats}}{{.Stats.TodayRecords}}{{else}}0{{end}}</div>
+            <div class="text-xs" style="color: var(--text-muted)">Bugün</div>
+        </div>
+        <div class="stat-card text-center">
+            <div class="text-2xl font-bold" style="color: var(--color-4)">{{len .Tags}}</div>
+            <div class="text-xs" style="color: var(--text-muted)">Farklı Konu</div>
+        </div>
+        <div class="stat-card text-center">
+            <div class="text-2xl font-bold" style="color: var(--success)">{{.FilteredCount}}</div>
+            <div class="text-xs" style="color: var(--text-muted)">Gösterilen</div>
+        </div>
+    </div>
+
+    <!-- Activity List -->
+    <div class="card p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="section-title">Kayıtlar</h2>
+            <button onclick="exportData()" class="btn btn-secondary text-sm">📥 Dışa Aktar</button>
+        </div>
+
+        <div class="space-y-3 max-h-[600px] overflow-y-auto">
+            {{if .Records}}
+            {{range .Records}}
+            <div class="flex items-start gap-4 p-4 rounded-lg activity-item">
+                <div class="text-center min-w-[60px]">
+                    <div class="font-mono text-lg font-bold" style="color: var(--accent)">{{.Time}}</div>
+                    <div class="text-xs" style="color: var(--text-muted)">{{.Date}}</div>
+                </div>
+                <div class="flex-1">
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        {{range (split .Tags ", ")}}
+                        <span class="tag">{{.}}</span>
+                        {{end}}
+                    </div>
+                    <p class="text-sm" style="color: var(--text-secondary)">{{.Summary}}</p>
+                </div>
+            </div>
+            {{end}}
+            {{else}}
+            <div class="text-center py-12" style="color: var(--text-muted)">
+                <p class="text-4xl mb-4">📭</p>
+                <p>Kayıt bulunamadı</p>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+
+<script>
+function filterByDate() {
+    const date = document.getElementById('dateFilter').value;
+    window.location.href = '/activities?date=' + date;
+}
+function exportData() {
+    window.open('/api/recent?limit=1000', '_blank');
+}
+</script>
+{{end}}

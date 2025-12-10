@@ -357,7 +357,7 @@ const MacOSMenuBar: React.FC<MacOSMenuBarProps> = ({
               className="cursor-pointer hover:opacity-80 transition-opacity duration-150 flex items-center space-x-2"
             >
               {/* HyprContext Icon - Transparent */}
-              <svg width="16" height="16" viewBox="0 0 24 24" className="text-amber-400">
+              <svg width="16" height="16" viewBox="0 0 24 24" className="text-indigo-400">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity="0.9"/>
                 <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
                 <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>

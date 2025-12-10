@@ -1,0 +1,58 @@
+{
+  "2025-11-28": {
+    "distraction_seconds": 5034,
+    "warnings_sent": [
+      1800,
+      3600
+    ],
+    "limit_reached": false
+  },
+  "2025-11-29": {
+    "distraction_seconds": 4320,
+    "warnings_sent": [
+      1800,
+      3600
+    ],
+    "limit_reached": false
+  },
+  "2025-11-30": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-01": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-02": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-03": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-04": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-05": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-09": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-10": {
+    "distraction_seconds": 1,
+    "warnings_sent": [],
+    "limit_reached": false
+  }
+}

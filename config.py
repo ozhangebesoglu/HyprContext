@@ -85,6 +85,9 @@ WEATHER_URL = f"wttr.in/{WEATHER_CITY}?format=%c+%t"
 # === PROFİL ===
 PROFILE_PATH = BASE_DIR / "profile.yaml"
 
+# === GÜNLÜK LİMİT ===
+DAILY_DISTRACTION_LIMIT_SECONDS = get_env_int("DAILY_DISTRACTION_LIMIT_SECONDS", 7200)  # 2 saat
+
 
 def ensure_dirs():
     """Gerekli klasörlerin var olduğundan emin ol."""

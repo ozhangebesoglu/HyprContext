@@ -1,277 +1,154 @@
-# 🧠 HyprContext
+# HyprContext - Windows Edition
 
-**Kişisel AI Hafıza Ajanı** - Ekranınızı analiz eden, aktivitelerinizi kaydeden ve size özel içgörüler sunan yerel yapay zeka asistanı.
+Windows için ekran aktivite izleme ve AI analiz aracı.
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![Ollama](https://img.shields.io/badge/Ollama-Local_AI-green)
-![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-purple)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+## 🚀 Özellikler
 
-## 📸 Ekran Görüntüleri
+- **Ekran Görüntüsü Alma:** Windows API ile otomatik screenshot
+- **Pencere Takibi:** Aktif ve arka plan pencerelerini izleme
+- **AI Analiz:** Ollama ile akıllı aktivite yorumlama
+- **Odak Takibi:** Dikkat dağınıklığı uyarıları
+- **Veritabanı:** SQLite ile yerel kayıt
+- **Bildirimler:** Windows toast bildirimleri ve sesli uyarı
 
-<details>
-<summary>🖥️ Canlı Dashboard</summary>
+## 📋 Gereksinimler
 
-![Dashboard](docs/screenshots/dashboard.jpeg)
+- Windows 10/11
+- Python 3.10+
+- [Ollama](https://ollama.ai/) (AI modeli için)
 
-</details>
+## 🛠️ Kurulum
 
-<details>
-<summary>📅 Günlük Plan (Obsidian)</summary>
-
-![Plan](docs/screenshots/plan_obsidian.jpeg)
-
-</details>
-
-<details>
-<summary>📝 Günlük Rapor (Obsidian)</summary>
-
-![Report](docs/screenshots/rapor_obsidian.jpeg)
-
-</details>
-
-<details>
-<summary>💬 Hafıza Sohbeti</summary>
-
-![Chat](docs/screenshots/chat.jpeg)
-
-</details>
-
-<details>
-<summary>⚡ Nasıl Çalışır (Loglar)</summary>
-
-![Logs](docs/screenshots/nasilcalisir.jpeg)
-
-</details>
-
-<details>
-<summary>🎯 Plan Oluşturma (Terminal)</summary>
-
-![Plan Terminal](docs/screenshots/planterminal.jpeg)
-
-</details>
-
-<details>
-<summary>📊 Rapor Oluşturma (Terminal)</summary>
-
-![Report Terminal](docs/screenshots/raporterminal.jpeg)
-
-</details>
-
-<details>
-<summary>🖥️ GPU Kullanımı</summary>
-
-![GPU](docs/screenshots/watchGPU.jpeg)
-
-</details>
-
-## ✨ Özellikler
-
-- 🖥️ **Ekran Analizi**: Periyodik ekran görüntüsü alıp AI ile analiz eder
-- 🧠 **Vektör Hafıza**: ChromaDB ile semantik arama yapılabilir hafıza
-- 📊 **Dashboard**: Terminal ve web tabanlı aktivite takibi
-- 📅 **Günlük Planlama**: Geçmiş aktivitelere dayalı kişiselleştirilmiş günlük plan
-- 📝 **Günlük Rapor**: Gün sonu aktivite özeti ve verimlilik analizi
-- 💬 **Hafıza Sohbeti**: Geçmiş aktiviteleriniz hakkında soru sorun
-- 🚨 **Odak Bekçisi**: Dikkat dağıtıcı aktiviteleri tespit edip uyarı verir
-
-## 🏗️ Mimari
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   grim      │────▶│   Gemma3    │────▶│  ChromaDB   │
-│ (screenshot)│     │  (analiz)   │     │  (hafıza)   │
-└─────────────┘     └─────────────┘     └─────────────┘
-                           │
-                           ▼
-              ┌─────────────────────────┐
-              │   Dashboard / Rapor     │
-              │   Planner / Chat        │
-              └─────────────────────────┘
+### 1. Ollama Kurulumu
+```powershell
+# Ollama'yı https://ollama.ai adresinden indirin
+# Kurulumdan sonra model indirin:
+ollama pull gemma3:4b
 ```
 
-## 📦 Gereksinimler
-
-### Sistem
-- Linux (Arch Linux önerilir)
-- Hyprland (Wayland compositor)
-- [Ollama](https://ollama.ai/) kurulu ve çalışır durumda
-
-### Ollama Modelleri
-```bash
-ollama pull gemma3
-ollama pull mxbai-embed-large
-```
-
-## 🚀 Kurulum
-
-### 1. Repoyu klonla
-```bash
-git clone https://github.com/kullanici/HyprContext.git
+### 2. Proje Kurulumu
+```powershell
+# Repo'yu klonlayın
+git clone -b windows https://github.com/KULLANICI_ADI/HyprContext.git
 cd HyprContext
-```
 
-### 2. Sanal ortam oluştur
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Kurulum scriptini çalıştırın
+install.bat
 ```
 
 ### 3. Konfigürasyon
-```bash
-# .env dosyasını oluştur
-cp .env.example .env
-nano .env  # Ayarları düzenle
+```powershell
+# .env dosyası oluşturun
+copy config.example.env .env
 
-# Profil dosyasını oluştur
-cp profile.yaml.example profile.yaml
-nano profile.yaml  # Kendi bilgilerinizi girin
+# .env dosyasını düzenleyin (opsiyonel)
+notepad .env
 ```
 
-### 4. Sistem araçları (Arch Linux)
-```bash
-sudo pacman -S grim libnotify
+## 🎯 Kullanım
+
+### Daemon Başlatma (Ana Mod)
+```powershell
+# Aktivasyon ve çalıştırma
+run.bat
+
+# Veya manuel:
+venv\Scripts\activate
+python main.py run
 ```
 
-## 🎮 Kullanım
+### CLI Komutları
+```powershell
+# Tek seferlik ekran yakalama
+python main.py capture
 
-### Ana Servis (Ekran İzleme)
-```bash
-python main.py
-```
+# İstatistikleri görüntüle
+python main.py stats
 
-### Terminal Dashboard
-```bash
-python dashboard.py
-```
+# Son aktiviteleri listele
+python main.py recent --limit 10
 
-### Web Dashboard
-```bash
-streamlit run web_dashboard.py
-```
+# Aktivitelerde arama
+python main.py search "Visual Studio"
 
-### Günlük Plan Oluştur
-```bash
-python planner.py
-# veya not ekleyerek:
-python planner.py "Bugün React öğreneceğim"
-```
-
-### Günlük Rapor
-```bash
-python daily_report.py
-```
-
-### Hafıza Sohbeti
-```bash
-python chat.py
-```
-
-## ⌨️ Shell Alias'ları (Önerilen)
-
-`.bashrc` veya `.zshrc` dosyasına ekleyin:
-
-```bash
-# HyprContext Kısayolları
-alias baslat="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/main.py"
-alias chat="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/chat.py"
-alias rapor="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/daily_report.py"
-alias plan="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/planner.py"
-alias dashboard="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/dashboard.py"
-```
-
-Sonra:
-```bash
-source ~/.zshrc  # veya ~/.bashrc
-```
-
-Artık sadece `baslat`, `chat`, `rapor`, `plan`, `dashboard` yazarak kullanabilirsiniz!
-
-## ⚙️ Systemd Servisi (Opsiyonel)
-
-Arka planda otomatik çalışması için:
-
-```bash
-# ~/.config/systemd/user/hyprcontext.service
-[Unit]
-Description=HyprContext AI Memory Agent
-After=graphical-session.target
-
-[Service]
-Type=simple
-WorkingDirectory=/path/to/HyprContext
-ExecStart=/path/to/HyprContext/venv/bin/python main.py
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=default.target
-```
-
-```bash
-systemctl --user enable hyprcontext
-systemctl --user start hyprcontext
+# Odak durumunu göster
+python main.py focus
 ```
 
 ## 📁 Dosya Yapısı
 
 ```
-HyprContext/
-├── main.py              # Ana izleme servisi
-├── dashboard.py         # Terminal UI
-├── web_dashboard.py     # Streamlit web UI
-├── planner.py           # Günlük plan oluşturucu
-├── daily_report.py      # Günlük rapor oluşturucu
-├── chat.py              # Hafıza sohbeti
-├── config.py            # Merkezi konfigürasyon
-├── database.py          # ChromaDB işlemleri
-├── window_utils.py      # Hyprland yardımcıları
-├── .env.example         # Örnek konfigürasyon
-├── profile.yaml.example # Örnek kullanıcı profili
-└── requirements.txt     # Python bağımlılıkları
+Windows/
+├── main.py           # Ana giriş noktası ve CLI
+├── config.py         # Konfigürasyon yönetimi
+├── capture.py        # Ekran görüntüsü alma
+├── window.py         # Windows API pencere bilgisi
+├── analyzer.py       # Ollama AI analizi
+├── database.py       # SQLite veritabanı
+├── focus.py          # Odak takibi
+├── notifier.py       # Windows bildirimleri
+├── requirements.txt  # Python bağımlılıkları
+├── config.example.env # Örnek konfigürasyon
+├── install.bat       # Kurulum scripti
+└── run.bat          # Çalıştırma scripti
 ```
 
-## 🔧 Konfigürasyon
+## ⚙️ Konfigürasyon Seçenekleri
 
-### .env Dosyası
-```env
-# Modeller
-MODEL_VISION=gemma3
-MODEL_EMBED=mxbai-embed-large
+| Değişken | Varsayılan | Açıklama |
+|----------|------------|----------|
+| `OLLAMA_URL` | `http://localhost:11434` | Ollama API adresi |
+| `MODEL_VISION` | `gemma3:4b` | Görüntü analiz modeli |
+| `CAPTURE_INTERVAL` | `20` | Screenshot aralığı (saniye) |
+| `FOCUS_DISTRACTION_THRESHOLD` | `300` | Dikkat dağınıklığı eşiği (saniye) |
+| `DATA_DIR` | `./data` | Veri dizini |
 
-# Zamanlama
-CAPTURE_INTERVAL=20  # saniye
+## 🔔 Bildirim Sistemi
 
-# Odak Bekçisi
-YASAKLI_KELIMELER=youtube,instagram,twitter,reddit,oyun,netflix
-DISTRACTION_THRESHOLD=3
+- **Toast Bildirimi:** Windows 10/11 bildirim merkezi
+- **Sesli Uyarı:** Text-to-Speech ile sesli bildirim
+- **Dikkat Uyarısı:** 5 dakika+ dikkat dağınıklığında uyarı
 
-# Hava Durumu
-WEATHER_CITY=Istanbul
+## 🗄️ Veritabanı
+
+SQLite veritabanı `data/memories.db` konumunda oluşturulur:
+
+```sql
+-- Aktivite kayıtları
+memories (
+    id, timestamp, screenshot_path,
+    active_window, all_windows, 
+    analysis, tags
+)
+
+-- Odak istatistikleri
+focus_stats (
+    id, date, total_time, 
+    distracted_time, productive_apps
+)
 ```
 
-### profile.yaml
-Planner ve diğer modüller için kullanıcı profili. Eğitim programı, projeler, hedefler gibi bilgiler içerir.
+## 🐛 Sorun Giderme
 
-## 🔒 Gizlilik
+### Ollama bağlantı hatası
+```powershell
+# Ollama'nın çalıştığından emin olun
+ollama serve
+```
 
-- Tüm veriler **yerel** olarak saklanır
-- Hiçbir veri internete gönderilmez
-- Ollama modelleri yerel çalışır
-- Kişisel dosyalar `.gitignore`'da
+### Ekran görüntüsü alınamıyor
+- Yönetici olarak çalıştırın
+- Antivirüs yazılımını kontrol edin
+
+### Pencere bilgisi alınamıyor
+- `pywin32` paketinin kurulu olduğundan emin olun
 
 ## 📄 Lisans
 
-MIT License
+MIT License - Detaylar için `LICENSE` dosyasına bakın.
 
-## 🤝 Katkıda Bulunma
+## 🔗 Diğer Versiyonlar
 
-Pull request'ler memnuniyetle karşılanır!
-
-1. Fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing`)
-3. Commit edin (`git commit -m 'Add amazing feature'`)
-4. Push edin (`git push origin feature/amazing`)
-5. Pull Request açın
-
+- **Linux (Hyprland):** `main` branch
+- **Rust Core:** `WRust/` klasörü
+- **Go Dashboard:** `WGo/` klasörü
