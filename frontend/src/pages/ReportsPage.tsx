@@ -11,12 +11,13 @@ import { GlassModal } from '../components/glass/GlassModal';
 import { ReportList } from '../components/features/ReportList';
 import { ReportViewer } from '../components/features/ReportViewer';
 import { useGenerateReport, useExportReport, useReports } from '../hooks/useApi';
-import { FileText, Download, Loader2, AlertCircle } from 'lucide-react';
+import { FileText, Download, Loader2, AlertCircle, FileOutput, FolderOpen } from 'lucide-react';
 
 export function ReportsPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [exportPath, setExportPath] = useState('/home/user/Obsidian/Vault/Raporlar/');
   
   const { data: reports, isLoading } = useReports();
   const generateReport = useGenerateReport();
@@ -31,9 +32,9 @@ export function ReportsPage() {
     generateReport.mutate(undefined);
   };
 
-  const handleExport = (path: string) => {
-    if (selectedDate) {
-      exportReport.mutate({ date: selectedDate, path });
+  const handleExport = () => {
+    if (selectedDate && exportPath) {
+      exportReport.mutate({ date: selectedDate, path: exportPath });
       setShowExportModal(false);
     }
   };
@@ -41,59 +42,71 @@ export function ReportsPage() {
   const selectedReport = reports?.find((r: any) => r.date === selectedDate);
 
   return (
-    <div className="reports-page h-full flex gap-4">
+    <div className="reports-page h-full flex gap-6 animate-fade-in">
       {/* Sidebar - Report List */}
-      <div className="w-72 flex flex-col gap-4">
-        <GlassCard className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-primary">📄 Raporlar</h3>
-            <GlassButton
-              onClick={handleGenerateClick}
-              disabled={generateReport.isPending}
-              title="Rapor Oluştur"
-            >
-              {generateReport.isPending ? (
-                <Loader2 size={18} className="animate-spin" />
-              ) : (
-                <FileText size={18} />
-              )}
-            </GlassButton>
-          </div>
-          
-          <ReportList
-            reports={reports || []}
-            selectedDate={selectedDate}
-            onSelect={setSelectedDate}
-            isLoading={isLoading}
-          />
-        </GlassCard>
+      <div className="w-80 flex flex-col gap-4">
+        {/* Action Button */}
+        <GlassButton
+          onClick={handleGenerateClick}
+          disabled={generateReport.isPending}
+          className="py-3"
+        >
+          {generateReport.isPending ? (
+            <Loader2 size={18} className="animate-spin mr-2" />
+          ) : (
+            <FileText size={18} className="mr-2" />
+          )}
+          Bugünü Raporla
+        </GlassButton>
+        
+        {/* Report List with FileTree */}
+        <ReportList
+          reports={reports || []}
+          selectedDate={selectedDate}
+          onSelect={setSelectedDate}
+          isLoading={isLoading}
+        />
       </div>
 
       {/* Main - Report Viewer */}
-      <div className="flex-1">
-        <GlassCard className="h-full flex flex-col">
+      <div className="flex-1 flex flex-col gap-4">
+        <GlassCard className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-primary">
-              {selectedDate ? `Rapor: ${selectedDate}` : 'Bir rapor seçin'}
-            </h2>
+            <div className="flex items-center gap-3">
+              <div className="stat-icon">
+                <FolderOpen size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-primary">
+                  {selectedDate ? `Rapor: ${selectedDate}` : 'Rapor Seçin'}
+                </h2>
+                <p className="text-xs text-muted">
+                  {selectedReport?.summary || 'Görüntülemek için bir rapor seçin'}
+                </p>
+              </div>
+            </div>
             
             {selectedDate && (
               <GlassButton
                 onClick={() => setShowExportModal(true)}
                 title="Obsidian'a Aktar"
               >
-                <Download size={18} />
-                <span className="ml-2">Aktar</span>
+                <FileOutput size={18} className="mr-2" />
+                Aktar
               </GlassButton>
             )}
           </div>
           
-          <div className="flex-1 overflow-auto p-4">
+          {/* Content */}
+          <div className="flex-1 overflow-auto p-6">
             {selectedReport ? (
               <ReportViewer report={selectedReport} />
             ) : (
-              <div className="h-full flex items-center justify-center text-muted">
-                Görüntülemek için bir rapor seçin
+              <div className="h-full flex flex-col items-center justify-center text-muted">
+                <FileText size={48} className="mb-4 opacity-50" />
+                <p>Görüntülemek için bir rapor seçin</p>
+                <p className="text-xs mt-1">veya yeni rapor oluşturun</p>
               </div>
             )}
           </div>
@@ -104,11 +117,13 @@ export function ReportsPage() {
       <GlassModal
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}
-        title="Rapor Oluştur"
+        title="📊 Rapor Oluştur"
       >
         <div className="p-4">
-          <div className="flex items-start gap-3 mb-4">
-            <AlertCircle className="text-accent flex-shrink-0" size={24} />
+          <div className="flex items-start gap-3 mb-6">
+            <div className="stat-icon">
+              <AlertCircle size={20} />
+            </div>
             <div>
               <p className="text-primary font-medium">
                 Bugün için rapor oluşturulsun mu?
@@ -126,7 +141,7 @@ export function ReportsPage() {
             </div>
           </div>
           
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3">
             <GlassButton
               variant="subtle"
               onClick={() => setShowConfirmModal(false)}
@@ -134,6 +149,7 @@ export function ReportsPage() {
               İptal
             </GlassButton>
             <GlassButton onClick={handleConfirmGenerate}>
+              <FileText size={16} className="mr-2" />
               Raporla
             </GlassButton>
           </div>
@@ -144,33 +160,33 @@ export function ReportsPage() {
       <GlassModal
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
-        title="Obsidian'a Aktar"
+        title="📤 Obsidian'a Aktar"
       >
         <div className="p-4">
           <p className="text-secondary mb-4">
-            Rapor Obsidian vault'unuza kaydedilecek.
+            Rapor belirtilen dizine Markdown dosyası olarak kaydedilecek.
           </p>
           
-          <input
-            type="text"
-            className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-primary placeholder-muted"
-            placeholder="/home/user/Obsidian/Vault/Raporlar/"
-            id="export-path"
-          />
+          <div className="space-y-2">
+            <label className="text-sm text-muted">Kayıt Dizini</label>
+            <input
+              type="text"
+              value={exportPath}
+              onChange={(e) => setExportPath(e.target.value)}
+              className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-primary placeholder-muted focus:outline-none focus:border-accent/50 transition-colors"
+              placeholder="/home/user/Obsidian/Vault/Raporlar/"
+            />
+          </div>
           
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="flex justify-end gap-3 mt-6">
             <GlassButton
               variant="subtle"
               onClick={() => setShowExportModal(false)}
             >
               İptal
             </GlassButton>
-            <GlassButton
-              onClick={() => {
-                const input = document.getElementById('export-path') as HTMLInputElement;
-                handleExport(input.value);
-              }}
-            >
+            <GlassButton onClick={handleExport}>
+              <Download size={16} className="mr-2" />
               Aktar
             </GlassButton>
           </div>
