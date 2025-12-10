@@ -147,3 +147,13 @@ def get_report_service():
         report_repository=get_report_repository(),
         activity_repository=get_activity_repository()
     )
+
+
+def get_course_detector():
+    """Course detector bağımlılığı."""
+    from ..services.course_detector import CourseDetectorService
+    
+    return CourseDetectorService(
+        window_capture=get_window_capture(),
+        notification=get_notification()
+    )

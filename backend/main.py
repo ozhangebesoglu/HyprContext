@@ -25,7 +25,8 @@ from .api.routes import (
     plans_router,
     reports_router,
     focus_router,
-    chat_router
+    chat_router,
+    profile_router
 )
 from .api.websocket.handlers import websocket_endpoint, broadcast_activity, broadcast_focus_update
 from .models.activity import Activity
@@ -47,10 +48,13 @@ _focus_task = None
 
 async def capture_loop():
     """Ekran görüntüsü yakalama döngüsü."""
+    from .core.dependencies import get_course_detector
+    
     screenshot_capture = get_screenshot_capture()
     window_capture = get_window_capture()
     analyzer = get_analyzer_service()
     activity_repo = get_activity_repository()
+    course_detector = get_course_detector()
     
     logger.info(f"Capture loop başlatıldı (interval: {settings.screenshot_interval}s)")
     
@@ -63,6 +67,11 @@ async def capture_loop():
                 # Pencere bilgilerini al
                 active_window = window_capture.get_active_window()
                 all_windows = window_capture.get_all_windows()
+                
+                # Kurs tespiti yap
+                course = course_detector.detect_course()
+                if course:
+                    course_detector.send_course_notification(course)
                 
                 # Analiz et
                 analysis = analyzer.analyze(
@@ -166,13 +175,13 @@ async def start_background_tasks():
     """Background task'ları sunucu hazır olduktan sonra başlat."""
     global _capture_task, _focus_task
     
-    # Biraz bekle
-    await asyncio.sleep(1)
+    # Biraz bekle ki sunucu tamamen hazır olsun
+    await asyncio.sleep(2)
     
-    # Task'ları başlat (şimdilik devre dışı - test için)
-    # _capture_task = asyncio.create_task(capture_loop())
-    # _focus_task = asyncio.create_task(focus_loop())
-    logger.info("Background tasks hazır (devre dışı)")
+    # Background task'ları başlat
+    _capture_task = asyncio.create_task(capture_loop())
+    _focus_task = asyncio.create_task(focus_loop())
+    logger.info("Background tasks başlatıldı")
 
 
 # CORS
@@ -190,6 +199,7 @@ app.include_router(plans_router, prefix="/api")
 app.include_router(reports_router, prefix="/api")
 app.include_router(focus_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
+app.include_router(profile_router, prefix="/api")
 
 # WebSocket
 app.websocket("/ws")(websocket_endpoint)

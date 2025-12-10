@@ -12,6 +12,7 @@ from .analyzer_service import AnalyzerService
 from .focus_service import FocusService
 from .plan_service import PlanService
 from .report_service import ReportService
+from .course_detector import CourseDetectorService
 
 __all__ = [
     "ScreenshotService",
@@ -20,4 +21,5 @@ __all__ = [
     "FocusService",
     "PlanService",
     "ReportService",
+    "CourseDetectorService",
 ]
