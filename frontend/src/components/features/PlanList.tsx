@@ -1,27 +1,71 @@
 /**
  * Plan List Component
  * -------------------
- * Plan listesi.
+ * FileTree kullanarak plan listesi.
  */
 
+import { useMemo } from 'react';
 import { usePlans } from '../../hooks/useApi';
-import { clsx } from 'clsx';
-import { Calendar, CheckCircle } from 'lucide-react';
+import { FileTree } from '../ui/file-tree';
+import { Calendar, Loader2 } from 'lucide-react';
 
 interface PlanListProps {
   selectedDate: string | null;
   onSelect: (date: string) => void;
 }
 
+interface FileNode {
+  name: string;
+  type: "file" | "folder";
+  children?: FileNode[];
+  extension?: string;
+  path?: string;
+}
+
 export function PlanList({ selectedDate, onSelect }: PlanListProps) {
   const { data: plans, isLoading } = usePlans();
 
+  // Plans'ı FileTree formatına dönüştür
+  const fileTreeData = useMemo(() => {
+    if (!plans || plans.length === 0) return [];
+
+    // Ay bazlı grupla
+    const grouped: Record<string, FileNode[]> = {};
+    
+    plans.forEach((plan: any) => {
+      const date = new Date(plan.date);
+      const monthKey = date.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+      
+      if (!grouped[monthKey]) {
+        grouped[monthKey] = [];
+      }
+      
+      grouped[monthKey].push({
+        name: `Plan_${plan.date}.md`,
+        type: "file" as const,
+        extension: "md",
+        path: plan.date,
+      });
+    });
+
+    // FileTree formatına çevir
+    return Object.entries(grouped).map(([month, files]) => ({
+      name: month,
+      type: "folder" as const,
+      children: files,
+    }));
+  }, [plans]);
+
+  const handleFileSelect = (file: FileNode) => {
+    if (file.path) {
+      onSelect(file.path);
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="space-y-2">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-16 bg-white/10 rounded-lg animate-pulse" />
-        ))}
+      <div className="flex items-center justify-center py-8">
+        <Loader2 size={24} className="animate-spin text-accent" />
       </div>
     );
   }
@@ -31,54 +75,19 @@ export function PlanList({ selectedDate, onSelect }: PlanListProps) {
       <div className="text-center py-8">
         <Calendar size={32} className="mx-auto mb-2 text-muted" />
         <p className="text-sm text-muted">Henüz plan yok</p>
+        <p className="text-xs text-muted mt-1">
+          Yeni plan oluşturmak için ✨ butonuna tıklayın
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2 max-h-96 overflow-auto">
-      {plans.map((plan: any) => (
-        <div
-          key={plan.date}
-          onClick={() => onSelect(plan.date)}
-          className={clsx(
-            'p-3 rounded-xl cursor-pointer transition-all duration-200',
-            'hover:bg-white/10',
-            selectedDate === plan.date && 'bg-white/20 ring-1 ring-accent/50'
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-primary">
-              {formatDate(plan.date)}
-            </span>
-            <span className="text-xs text-muted">
-              {Math.round(plan.completion_rate * 100)}%
-            </span>
-          </div>
-          
-          <p className="text-xs text-muted truncate mt-1">
-            {plan.mission}
-          </p>
-          
-          {plan.completion_rate === 1 && (
-            <CheckCircle size={14} className="text-green-500 mt-1" />
-          )}
-        </div>
-      ))}
-    </div>
+    <FileTree
+      data={fileTreeData}
+      selectedFile={selectedDate || undefined}
+      onFileSelect={handleFileSelect}
+      title="📅 Planlar"
+    />
   );
-}
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  const today = new Date();
-  
-  if (date.toDateString() === today.toDateString()) {
-    return 'Bugün';
-  }
-  
-  return date.toLocaleDateString('tr-TR', {
-    day: 'numeric',
-    month: 'short',
-  });
 }

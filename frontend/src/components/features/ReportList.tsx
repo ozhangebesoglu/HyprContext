@@ -1,10 +1,11 @@
 /**
  * Report List Component
  * ---------------------
- * Rapor listesi.
+ * FileTree kullanarak rapor listesi.
  */
 
-import { clsx } from 'clsx';
+import { useMemo } from 'react';
+import { FileTree } from '../ui/file-tree';
 import { FileText, Loader2 } from 'lucide-react';
 
 interface Report {
@@ -12,6 +13,14 @@ interface Report {
   date: string;
   summary: string;
   activity_count: number;
+}
+
+interface FileNode {
+  name: string;
+  type: "file" | "folder";
+  children?: FileNode[];
+  extension?: string;
+  path?: string;
 }
 
 interface ReportListProps {
@@ -27,6 +36,43 @@ export function ReportList({
   onSelect,
   isLoading,
 }: ReportListProps) {
+  // Reports'u FileTree formatına dönüştür
+  const fileTreeData = useMemo(() => {
+    if (!reports || reports.length === 0) return [];
+
+    // Ay bazlı grupla
+    const grouped: Record<string, FileNode[]> = {};
+    
+    reports.forEach((report) => {
+      const date = new Date(report.date);
+      const monthKey = date.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+      
+      if (!grouped[monthKey]) {
+        grouped[monthKey] = [];
+      }
+      
+      grouped[monthKey].push({
+        name: `${report.date}.md`,
+        type: "file" as const,
+        extension: "md",
+        path: report.date,
+      });
+    });
+
+    // FileTree formatına çevir
+    return Object.entries(grouped).map(([month, files]) => ({
+      name: month,
+      type: "folder" as const,
+      children: files,
+    }));
+  }, [reports]);
+
+  const handleFileSelect = (file: FileNode) => {
+    if (file.path) {
+      onSelect(file.path);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -40,45 +86,19 @@ export function ReportList({
       <div className="text-center py-8">
         <FileText size={32} className="mx-auto mb-2 text-muted" />
         <p className="text-sm text-muted">Henüz rapor yok</p>
+        <p className="text-xs text-muted mt-1">
+          Rapor oluşturmak için 📊 butonuna tıklayın
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2 max-h-96 overflow-auto">
-      {reports.map((report) => (
-        <div
-          key={report.date}
-          onClick={() => onSelect(report.date)}
-          className={clsx(
-            'p-3 rounded-xl cursor-pointer transition-all duration-200',
-            'hover:bg-white/10',
-            selectedDate === report.date && 'bg-white/20 ring-1 ring-accent/50'
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-primary">
-              {formatDate(report.date)}
-            </span>
-            <span className="text-xs text-muted">
-              {report.activity_count} aktivite
-            </span>
-          </div>
-          
-          <p className="text-xs text-muted truncate mt-1">
-            {report.summary || 'Özet yok'}
-          </p>
-        </div>
-      ))}
-    </div>
+    <FileTree
+      data={fileTreeData}
+      selectedFile={selectedDate || undefined}
+      onFileSelect={handleFileSelect}
+      title="📄 Raporlar"
+    />
   );
-}
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('tr-TR', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
 }

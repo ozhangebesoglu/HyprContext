@@ -67,6 +67,14 @@ export function useTodayPlan() {
   });
 }
 
+export function usePlan(date: string) {
+  return useQuery({
+    queryKey: ['plans', date],
+    queryFn: () => fetchApi(`/plans/${date}`),
+    enabled: !!date,
+  });
+}
+
 export function useGeneratePlan() {
   const queryClient = useQueryClient();
   
