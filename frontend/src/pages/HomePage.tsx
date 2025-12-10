@@ -19,11 +19,13 @@ export function HomePage() {
     <div className="home-page h-full overflow-auto pr-2">
       {/* Header */}
       <header className="mb-8 animate-slide-down">
-        <div className="flex items-center gap-3 mb-1">
-          <span className="text-3xl">{emoji}</span>
-          <h1 className="text-3xl font-bold text-primary">{greeting}</h1>
+        <div className="flex items-center gap-4 mb-2">
+          <span className="text-4xl">{emoji}</span>
+          <h1 className="font-handwriting text-5xl font-semibold text-primary tracking-wide">
+            {greeting}
+          </h1>
         </div>
-        <p className="text-secondary ml-12">
+        <p className="text-secondary ml-14 font-medium">
           {now.toLocaleDateString('tr-TR', {
             weekday: 'long',
             year: 'numeric',
