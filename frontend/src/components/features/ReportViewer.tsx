@@ -7,16 +7,7 @@
 import ReactMarkdown from 'react-markdown';
 import { GlassCard } from '../glass/GlassCard';
 import { BarChart2, Clock, Cpu } from 'lucide-react';
-
-interface Report {
-  id: string;
-  date: string;
-  summary: string;
-  content: string;
-  technologies: string[];
-  activity_count: number;
-  focus_percentage?: number;
-}
+import type { Report } from '../../types/api';
 
 interface ReportViewerProps {
   report: Report;
@@ -30,7 +21,7 @@ export function ReportViewer({ report }: ReportViewerProps) {
         <StatCard
           icon={<Clock size={20} />}
           label="Aktivite"
-          value={report.activity_count}
+          value={report.activity_count || 0}
         />
         <StatCard
           icon={<BarChart2 size={20} />}
@@ -40,12 +31,12 @@ export function ReportViewer({ report }: ReportViewerProps) {
         <StatCard
           icon={<Cpu size={20} />}
           label="Teknoloji"
-          value={report.technologies.length}
+          value={report.technologies?.length || 0}
         />
       </div>
 
       {/* Technologies */}
-      {report.technologies.length > 0 && (
+      {report.technologies && report.technologies.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {report.technologies.map((tech, i) => (
             <span
@@ -60,7 +51,7 @@ export function ReportViewer({ report }: ReportViewerProps) {
 
       {/* Content */}
       <div className="prose prose-invert max-w-none">
-        <ReactMarkdown>{report.content}</ReactMarkdown>
+        <ReactMarkdown>{report.content || ''}</ReactMarkdown>
       </div>
     </div>
   );

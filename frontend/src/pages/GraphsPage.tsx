@@ -42,19 +42,19 @@ export function GraphsPage() {
           icon={<Target size={20} />}
           label="Odak Skoru"
           value={focusStats ? `${Math.round((1 - focusStats.percentage / 100) * 100)}%` : '--'}
-          trend={focusStats?.percentage < 50 ? '+' : '-'}
+          trend={focusStats?.percentage && focusStats.percentage < 50 ? '+' : '-'}
         />
         <QuickStat
           icon={<Clock size={20} />}
-          label="Aktif Süre"
-          value={activityStats?.total_hours ? `${activityStats.total_hours}s` : '--'}
-          trend="+5%"
+          label="Toplam Gün"
+          value={activityStats?.total_days ?? '--'}
+          trend=""
         />
         <QuickStat
           icon={<Zap size={20} />}
-          label="Verimlilik"
-          value={activityStats?.productivity || '--'}
-          trend="+8%"
+          label="Günlük Ort."
+          value={activityStats?.activities_per_day ? Math.round(activityStats.activities_per_day) : '--'}
+          trend=""
         />
       </div>
 

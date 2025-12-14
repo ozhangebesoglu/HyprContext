@@ -27,12 +27,21 @@ class ActivityResponse(BaseModel):
         from_attributes = True
 
 
+class DayData(BaseModel):
+    """Günlük veri."""
+    day: str
+    activities: int
+
+
 class ActivityStats(BaseModel):
     """Aktivite istatistikleri."""
     total_activities: int
     total_days: int
+    today_count: int = 0
     top_tags: list[tuple[str, int]]
     activities_per_day: float
+    by_hour: dict[str, int] = {}
+    by_day: list[DayData] = []
 
 
 @router.get("/", response_model=list[ActivityResponse])

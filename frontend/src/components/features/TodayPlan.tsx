@@ -17,15 +17,19 @@ export function TodayPlan() {
 
   if (isLoading) {
     return (
-      <GlassCard className="p-4 animate-pulse">
-        <div className="h-48" />
+      <GlassCard className="p-4 min-h-[200px]">
+        <div className="space-y-4">
+          <div className="h-6 bg-white/20 rounded-lg w-1/2 shimmer" />
+          <div className="h-16 bg-white/10 rounded-xl shimmer" />
+          <div className="h-3 bg-white/10 rounded-full shimmer" />
+        </div>
       </GlassCard>
     );
   }
 
   if (error || !plan) {
     return (
-      <GlassCard className="p-4">
+      <GlassCard className="p-4 min-h-[200px]">
         <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
           <Calendar size={20} />
           Bugünün Planı
@@ -54,7 +58,7 @@ export function TodayPlan() {
 
   return (
     <GlassCard
-      className="p-4 cursor-pointer"
+      className="p-4 min-h-[200px] cursor-pointer"
       interactive
       onClick={() => navigate('/plans')}
     >

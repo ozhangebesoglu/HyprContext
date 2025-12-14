@@ -114,6 +114,14 @@ export function useReports() {
   });
 }
 
+export function useReport(date: string) {
+  return useQuery<Report>({
+    queryKey: ['reports', date],
+    queryFn: () => fetchApi<Report>(`/reports/${date}`),
+    enabled: !!date,
+  });
+}
+
 export function useGenerateReport() {
   const queryClient = useQueryClient();
   

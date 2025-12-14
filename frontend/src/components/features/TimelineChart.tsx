@@ -1,27 +1,39 @@
 /**
  * Timeline Chart Component
  * ------------------------
- * Zaman çizelgesi grafiği.
+ * Haftalık aktivite zaman çizelgesi grafiği.
  */
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-
-// Mock data - gerçek API'den gelecek
-const mockData = [
-  { day: 'Pzt', activities: 24, focus: 85 },
-  { day: 'Sal', activities: 18, focus: 72 },
-  { day: 'Çar', activities: 32, focus: 90 },
-  { day: 'Per', activities: 28, focus: 78 },
-  { day: 'Cum', activities: 20, focus: 65 },
-  { day: 'Cmt', activities: 12, focus: 45 },
-  { day: 'Paz', activities: 8, focus: 40 },
-];
+import { useActivityStats } from '@/hooks/useApi';
+import type { DayData } from '@/types/api';
 
 export function TimelineChart() {
+  const { data: stats, isLoading } = useActivityStats();
+  
+  // API'den gelen veri veya boş dizi
+  const data: DayData[] = stats?.by_day ?? [];
+  
+  if (isLoading) {
+    return (
+      <div className="h-48 flex items-center justify-center">
+        <div className="text-muted-foreground">Yükleniyor...</div>
+      </div>
+    );
+  }
+  
+  if (data.length === 0) {
+    return (
+      <div className="h-48 flex items-center justify-center">
+        <div className="text-muted-foreground">Veri bulunamadı</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-48">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={mockData}>
+        <BarChart data={data}>
           <XAxis
             dataKey="day"
             stroke="rgb(68.4% 61.7% 54.3%)"
@@ -49,10 +61,10 @@ export function TimelineChart() {
           />
           
           <Bar dataKey="activities" radius={[8, 8, 0, 0]}>
-            {mockData.map((entry, index) => (
+            {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={`rgba(164, 100, 59, ${0.4 + entry.focus / 200})`}
+                fill={`rgba(164, 100, 59, ${Math.min(0.4 + entry.activities / 100, 1)})`}
               />
             ))}
           </Bar>

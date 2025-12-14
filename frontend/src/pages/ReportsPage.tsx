@@ -10,7 +10,7 @@ import { GlassButton } from '../components/ui/glass-button';
 import { GlassModal } from '../components/glass/GlassModal';
 import { ReportList } from '../components/features/ReportList';
 import { ReportViewer } from '../components/features/ReportViewer';
-import { useGenerateReport, useExportReport, useReports } from '../hooks/useApi';
+import { useGenerateReport, useExportReport, useReports, useReport } from '../hooks/useApi';
 import { FileText, Download, Loader2, AlertCircle, FileOutput, FolderOpen } from 'lucide-react';
 
 export function ReportsPage() {
@@ -20,6 +20,7 @@ export function ReportsPage() {
   const [exportPath, setExportPath] = useState('/home/user/Obsidian/Vault/Raporlar/');
   
   const { data: reports, isLoading } = useReports();
+  const { data: selectedReport, isLoading: isLoadingReport } = useReport(selectedDate || '');
   const generateReport = useGenerateReport();
   const exportReport = useExportReport();
 
@@ -39,7 +40,8 @@ export function ReportsPage() {
     }
   };
 
-  const selectedReport = reports?.find((r: any) => r.date === selectedDate);
+  // Liste özetinden sadece summary al
+  const reportSummary = reports?.find((r: any) => r.date === selectedDate)?.summary;
 
   return (
     <div className="reports-page h-full flex gap-6 animate-fade-in">
@@ -84,7 +86,7 @@ export function ReportsPage() {
                   {selectedDate ? `Rapor: ${selectedDate}` : 'Rapor Seçin'}
                 </h2>
                 <p className="text-xs text-muted">
-                  {selectedReport?.summary || 'Görüntülemek için bir rapor seçin'}
+                  {reportSummary || 'Görüntülemek için bir rapor seçin'}
                 </p>
               </div>
             </div>
@@ -104,7 +106,11 @@ export function ReportsPage() {
           
           {/* Content */}
           <div className="flex-1 overflow-auto p-6">
-            {selectedReport ? (
+            {isLoadingReport ? (
+              <div className="h-full flex items-center justify-center">
+                <Loader2 size={32} className="animate-spin text-accent" />
+              </div>
+            ) : selectedReport ? (
               <ReportViewer report={selectedReport} />
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-muted">

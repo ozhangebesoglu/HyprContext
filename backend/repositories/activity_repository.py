@@ -112,16 +112,41 @@ class ActivityRepository(IActivityRepository):
     
     def get_stats(self) -> dict:
         """İstatistikleri getir."""
+        from datetime import date as date_type, timedelta
+        
         activities = self._read_all_jsonl()
+        today = date_type.today()
         
         # Tarihe göre grupla
         date_counts = {}
         tag_counts = {}
+        hour_counts = {}  # Bugünün saatlik dağılımı
+        daily_counts = {}  # Son 7 günün günlük dağılımı
+        today_count = 0
+        
+        # Son 7 gün için boş sayaçlar oluştur
+        day_names = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+        for i in range(7):
+            d = today - timedelta(days=6-i)
+            day_name = day_names[d.weekday()]
+            daily_counts[d.isoformat()] = {"day": day_name, "activities": 0}
         
         for act in activities:
             # Tarih sayısı
             act_date = act.get_date()
             date_counts[act_date] = date_counts.get(act_date, 0) + 1
+            
+            # Bugünün aktiviteleri
+            if act_date == today.isoformat():
+                today_count += 1
+                # Saatlik dağılım
+                hour = act.timestamp.hour
+                hour_key = f"{hour:02d}"
+                hour_counts[hour_key] = hour_counts.get(hour_key, 0) + 1
+            
+            # Son 7 gün
+            if act_date in daily_counts:
+                daily_counts[act_date]["activities"] += 1
             
             # Etiket sayısı
             for tag in act.tags:
@@ -130,8 +155,11 @@ class ActivityRepository(IActivityRepository):
         return {
             "total_activities": len(activities),
             "total_days": len(date_counts),
+            "today_count": today_count,
             "top_tags": sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)[:10],
-            "activities_per_day": sum(date_counts.values()) / max(len(date_counts), 1)
+            "activities_per_day": sum(date_counts.values()) / max(len(date_counts), 1),
+            "by_hour": hour_counts,
+            "by_day": list(daily_counts.values())
         }
     
     def _save_to_jsonl(self, activity: Activity) -> None:

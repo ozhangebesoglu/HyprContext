@@ -27,7 +27,7 @@ export function NotificationToast() {
   const removeNotification = useSystemStore((state) => state.removeNotification);
 
   return (
-    <div className="fixed top-14 right-4 z-50 flex flex-col gap-2 max-w-sm">
+    <div className="fixed bottom-24 right-4 z-50 flex flex-col-reverse gap-2 max-w-sm">
       {notifications.map((notification) => {
         const Icon = icons[notification.type];
         
@@ -91,3 +91,7 @@ function ToastItem({ notification, Icon, onRemove }: ToastItemProps) {
     </div>
   );
 }
+
+
+
+

@@ -13,18 +13,23 @@ export function ActivityChart() {
 
   // API'den gelen by_hour verisini chart formatına çevir
   const chartData = useMemo(() => {
-    if (!stats?.by_hour) {
-      // Varsayılan boş data
-      return Array.from({ length: 24 }, (_, i) => ({
-        time: `${String(i).padStart(2, '0')}:00`,
-        count: 0,
-      }));
+    // 24 saat için veri oluştur
+    const hourData = Array.from({ length: 24 }, (_, i) => ({
+      time: `${String(i).padStart(2, '0')}:00`,
+      count: 0,
+    }));
+
+    // API'den gelen verileri ekle
+    if (stats?.by_hour) {
+      Object.entries(stats.by_hour).forEach(([hour, count]) => {
+        const hourIndex = parseInt(hour);
+        if (hourIndex >= 0 && hourIndex < 24) {
+          hourData[hourIndex].count = count as number;
+        }
+      });
     }
 
-    return Object.entries(stats.by_hour).map(([hour, count]) => ({
-      time: `${hour}:00`,
-      count: count as number,
-    })).sort((a, b) => parseInt(a.time) - parseInt(b.time));
+    return hourData;
   }, [stats?.by_hour]);
 
   if (isLoading) {

@@ -14,6 +14,11 @@ export interface Activity {
   app_name?: string;
 }
 
+export interface DayData {
+  day: string;
+  activities: number;
+}
+
 export interface ActivityStats {
   total_activities: number;
   total_days: number;
@@ -21,6 +26,7 @@ export interface ActivityStats {
   top_tags: [string, number][];
   today_count?: number;
   by_hour?: Record<string, number>;
+  by_day?: DayData[];
 }
 
 // Focus
@@ -58,9 +64,13 @@ export interface PlanTask {
 
 // Report
 export interface Report {
+  id: string;
   date: string;
-  summary?: string;
+  summary: string;
   content: string;
+  technologies: string[];
+  activity_count: number;
+  focus_percentage?: number;
   created_at?: string;
 }
 

@@ -16,8 +16,8 @@ export function FocusWidget() {
 
   if (isLoading || !stats) {
     return (
-      <GlassCard className="p-5">
-        <div className="animate-pulse space-y-4">
+      <GlassCard className="p-5 min-h-[220px]">
+        <div className="space-y-4">
           <div className="h-6 bg-white/20 rounded-lg w-1/2 shimmer" />
           <div className="h-4 bg-white/10 rounded-full shimmer" />
           <div className="grid grid-cols-2 gap-4">
@@ -36,8 +36,8 @@ export function FocusWidget() {
   return (
     <GlassCard
       className={clsx(
-        'p-5 transition-all duration-500',
-        isDistracted && 'ring-2 ring-red-500/50 animate-pulse'
+        'p-5 min-h-[220px] transition-colors duration-500',
+        isDistracted && 'ring-2 ring-red-500/50'
       )}
     >
       {/* Header */}
@@ -49,9 +49,9 @@ export function FocusWidget() {
           <span>Odak Durumu</span>
         </h3>
         <div className={clsx(
-          'p-2 rounded-full transition-all duration-300',
+          'p-2 rounded-full transition-colors duration-300',
           isDistracted 
-            ? 'bg-red-500/20 text-red-500 animate-pulse' 
+            ? 'bg-red-500/20 text-red-500' 
             : 'bg-green-500/20 text-green-500'
         )}>
           {isDistracted ? (
@@ -108,9 +108,9 @@ export function FocusWidget() {
 
       {/* Warning Message */}
       {stats.limit_reached && (
-        <div className="mt-4 p-3 bg-red-500/20 rounded-xl border border-red-500/30 animate-scale-in">
+        <div className="mt-4 p-3 bg-red-500/20 rounded-xl border border-red-500/30">
           <p className="text-sm text-red-500 text-center font-medium flex items-center justify-center gap-2">
-            <Zap size={16} className="animate-pulse" />
+            <Zap size={16} />
             Günlük limit doldu!
           </p>
         </div>
