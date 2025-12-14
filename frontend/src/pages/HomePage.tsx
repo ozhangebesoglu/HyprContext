@@ -8,6 +8,7 @@ import { GlassCard } from '../components/glass/GlassCard';
 import { FocusWidget } from '../components/features/FocusWidget';
 import { RecentActivities } from '../components/features/RecentActivities';
 import { TodayPlan } from '../components/features/TodayPlan';
+import { useActivityStats, useFocusStats } from '../hooks/useApi';
 import { Clock, Activity, Target, Sparkles } from 'lucide-react';
 
 export function HomePage() {
@@ -62,6 +63,15 @@ export function HomePage() {
 }
 
 function QuickStats() {
+  const { data: activityStats, isLoading: loadingActivity } = useActivityStats();
+  const { data: focusStats, isLoading: loadingFocus } = useFocusStats();
+
+  const totalCount = activityStats?.total_activities ?? 0;
+  const avgPerDay = activityStats?.activities_per_day ?? 0;
+  const focusScore = focusStats 
+    ? Math.round(100 - focusStats.percentage) 
+    : 0;
+
   return (
     <GlassCard className="p-5 h-full">
       <h3 className="text-lg font-semibold text-primary mb-5 flex items-center gap-2">
@@ -74,20 +84,20 @@ function QuickStats() {
       <div className="grid grid-cols-3 gap-5">
         <StatItem
           icon={<Clock size={22} />}
-          label="Bugün"
-          value="--"
+          label="Toplam"
+          value={loadingActivity ? "--" : String(totalCount)}
           subtext="aktivite"
         />
         <StatItem
           icon={<Activity size={22} />}
-          label="Bu Hafta"
-          value="--"
+          label="Günlük Ort."
+          value={loadingActivity ? "--" : String(Math.round(avgPerDay))}
           subtext="aktivite"
         />
         <StatItem
           icon={<Target size={22} />}
           label="Odak"
-          value="--%"
+          value={loadingFocus ? "--%"  : `${focusScore}%`}
           subtext="verimlilik"
         />
       </div>

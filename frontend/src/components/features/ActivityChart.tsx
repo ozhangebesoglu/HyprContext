@@ -6,26 +6,39 @@
 
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useActivityStats } from '../../hooks/useApi';
-
-// Mock data - gerçek API'den gelecek
-const mockData = [
-  { time: '00:00', count: 0 },
-  { time: '06:00', count: 2 },
-  { time: '09:00', count: 8 },
-  { time: '12:00', count: 5 },
-  { time: '15:00', count: 12 },
-  { time: '18:00', count: 7 },
-  { time: '21:00', count: 3 },
-  { time: '23:00', count: 1 },
-];
+import { useMemo } from 'react';
 
 export function ActivityChart() {
-  const { data: stats } = useActivityStats();
+  const { data: stats, isLoading } = useActivityStats();
+
+  // API'den gelen by_hour verisini chart formatına çevir
+  const chartData = useMemo(() => {
+    if (!stats?.by_hour) {
+      // Varsayılan boş data
+      return Array.from({ length: 24 }, (_, i) => ({
+        time: `${String(i).padStart(2, '0')}:00`,
+        count: 0,
+      }));
+    }
+
+    return Object.entries(stats.by_hour).map(([hour, count]) => ({
+      time: `${hour}:00`,
+      count: count as number,
+    })).sort((a, b) => parseInt(a.time) - parseInt(b.time));
+  }, [stats?.by_hour]);
+
+  if (isLoading) {
+    return (
+      <div className="h-64 flex items-center justify-center">
+        <div className="animate-pulse text-muted">Yükleniyor...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={mockData}>
+        <AreaChart data={chartData}>
           <defs>
             <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="rgb(64.4% 39.4% 23.2%)" stopOpacity={0.3} />

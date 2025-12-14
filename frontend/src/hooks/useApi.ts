@@ -5,6 +5,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { Activity, ActivityStats, FocusStats, FocusCheck, Plan, Report, Profile } from '../types/api';
 
 const API_BASE = 'http://localhost:8000/api';
 
@@ -31,46 +32,46 @@ export function useActivities(date?: string, limit = 50) {
   if (date) params.append('date', date);
   params.append('limit', String(limit));
   
-  return useQuery({
+  return useQuery<Activity[]>({
     queryKey: ['activities', date, limit],
-    queryFn: () => fetchApi(`/activities?${params}`),
+    queryFn: () => fetchApi<Activity[]>(`/activities?${params}`),
   });
 }
 
 export function useSearchActivities(query: string) {
-  return useQuery({
+  return useQuery<Activity[]>({
     queryKey: ['activities', 'search', query],
-    queryFn: () => fetchApi(`/activities/search?q=${encodeURIComponent(query)}`),
+    queryFn: () => fetchApi<Activity[]>(`/activities/search?q=${encodeURIComponent(query)}`),
     enabled: query.length >= 2,
   });
 }
 
 export function useActivityStats() {
-  return useQuery({
+  return useQuery<ActivityStats>({
     queryKey: ['activities', 'stats'],
-    queryFn: () => fetchApi('/activities/stats'),
+    queryFn: () => fetchApi<ActivityStats>('/activities/stats'),
   });
 }
 
 // Plans
 export function usePlans() {
-  return useQuery({
+  return useQuery<Plan[]>({
     queryKey: ['plans'],
-    queryFn: () => fetchApi('/plans'),
+    queryFn: () => fetchApi<Plan[]>('/plans'),
   });
 }
 
 export function useTodayPlan() {
-  return useQuery({
+  return useQuery<Plan>({
     queryKey: ['plans', 'today'],
-    queryFn: () => fetchApi('/plans/today'),
+    queryFn: () => fetchApi<Plan>('/plans/today'),
   });
 }
 
 export function usePlan(date: string) {
-  return useQuery({
+  return useQuery<Plan>({
     queryKey: ['plans', date],
-    queryFn: () => fetchApi(`/plans/${date}`),
+    queryFn: () => fetchApi<Plan>(`/plans/${date}`),
     enabled: !!date,
   });
 }
@@ -107,9 +108,9 @@ export function useUpdatePlan() {
 
 // Reports
 export function useReports() {
-  return useQuery({
+  return useQuery<Report[]>({
     queryKey: ['reports'],
-    queryFn: () => fetchApi('/reports'),
+    queryFn: () => fetchApi<Report[]>('/reports'),
   });
 }
 
@@ -118,7 +119,7 @@ export function useGenerateReport() {
   
   return useMutation({
     mutationFn: (date?: string) =>
-      fetchApi('/reports/generate', {
+      fetchApi<Report>('/reports/generate', {
         method: 'POST',
         body: JSON.stringify({ date }),
       }),
@@ -140,17 +141,17 @@ export function useExportReport() {
 
 // Focus
 export function useFocusStats() {
-  return useQuery({
+  return useQuery<FocusStats>({
     queryKey: ['focus', 'stats'],
-    queryFn: () => fetchApi('/focus/stats'),
+    queryFn: () => fetchApi<FocusStats>('/focus/stats'),
     refetchInterval: 5000, // 5 saniyede bir güncelle
   });
 }
 
 export function useFocusCheck() {
-  return useQuery({
+  return useQuery<FocusCheck>({
     queryKey: ['focus', 'check'],
-    queryFn: () => fetchApi('/focus/check'),
+    queryFn: () => fetchApi<FocusCheck>('/focus/check'),
     refetchInterval: 1000, // Her saniye kontrol
   });
 }
