@@ -17,6 +17,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('navigate', (_, path) => callback(path));
   },
   
+  // Capture control
+  getCaptureStatus: () => ipcRenderer.invoke('get-capture-status'),
+  toggleCapture: () => ipcRenderer.invoke('toggle-capture'),
+  onCaptureStatusChanged: (callback) => {
+    ipcRenderer.on('capture-status-changed', (_, isRunning) => callback(isRunning));
+  },
+  
   // Focus stats update
   updateTrayStats: (stats) => {
     ipcRenderer.send('tray:update-stats', stats);

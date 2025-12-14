@@ -8,6 +8,7 @@ import { GlassCard } from '../components/glass/GlassCard';
 import { FocusWidget } from '../components/features/FocusWidget';
 import { RecentActivities } from '../components/features/RecentActivities';
 import { TodayPlan } from '../components/features/TodayPlan';
+import { CaptureControl } from '../components/features/CaptureControl';
 import { useActivityStats, useFocusStats } from '../hooks/useApi';
 import { Clock, Activity, Target, Sparkles } from 'lucide-react';
 
@@ -38,13 +39,18 @@ export function HomePage() {
 
       {/* Grid Layout */}
       <div className="grid grid-cols-12 gap-5">
-        {/* Focus Widget - Sol üst */}
+        {/* Capture Control - Sol üst */}
         <div className="col-span-12 lg:col-span-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <CaptureControl />
+        </div>
+
+        {/* Focus Widget - Orta üst */}
+        <div className="col-span-12 lg:col-span-4 animate-slide-up" style={{ animationDelay: '0.15s' }}>
           <FocusWidget />
         </div>
 
         {/* Quick Stats - Sağ üst */}
-        <div className="col-span-12 lg:col-span-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <div className="col-span-12 lg:col-span-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
           <QuickStats />
         </div>
 

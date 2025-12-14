@@ -174,3 +174,49 @@ export function useChat() {
       }),
   });
 }
+
+// Control - Capture başlat/durdur
+export interface ControlStatus {
+  running: boolean;
+  capture_active: boolean;
+  focus_active: boolean;
+  uptime_seconds?: number | null;
+  last_activity?: string;
+  today_count?: number;
+}
+
+export function useControlStatus() {
+  return useQuery<ControlStatus>({
+    queryKey: ['control', 'status'],
+    queryFn: () => fetchApi<ControlStatus>('/control/status'),
+    refetchInterval: 3000, // 3 saniyede bir güncelle
+  });
+}
+
+export function useStartCapture() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: () =>
+      fetchApi('/control/start', {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['control', 'status'] });
+    },
+  });
+}
+
+export function useStopCapture() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: () =>
+      fetchApi('/control/stop', {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['control', 'status'] });
+    },
+  });
+}
