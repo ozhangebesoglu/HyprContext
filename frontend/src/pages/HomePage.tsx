@@ -9,6 +9,7 @@ import { FocusWidget } from '../components/features/FocusWidget';
 import { RecentActivities } from '../components/features/RecentActivities';
 import { TodayPlan } from '../components/features/TodayPlan';
 import { CaptureControl } from '../components/features/CaptureControl';
+import { PageTransition } from '../components/layout/PageTransition';
 import { useActivityStats, useFocusStats } from '../hooks/useApi';
 import { Clock, Activity, Target, Sparkles } from 'lucide-react';
 
@@ -18,6 +19,7 @@ export function HomePage() {
   const emoji = getEmoji(now.getHours());
 
   return (
+    <PageTransition>
     <div className="home-page h-full overflow-auto pr-2">
       {/* Header */}
       <header className="mb-8 animate-slide-down">
@@ -65,6 +67,7 @@ export function HomePage() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }
 

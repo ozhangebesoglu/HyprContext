@@ -9,11 +9,13 @@ import { GlassCard } from '../components/glass/GlassCard';
 import { GlassButton } from '../components/ui/glass-button';
 import { PlanEditor } from '../components/features/PlanEditor';
 import { PlanList } from '../components/features/PlanList';
+import { PageTransition } from '../components/layout/PageTransition';
 import { useGeneratePlan, useTodayPlan, usePlan, useExportPlan } from '../hooks/useApi';
 import { useSystemStore } from '../stores/systemStore';
-import { Wand2, Loader2, Save, FolderOpen, Download } from 'lucide-react';
+import { Wand2, Loader2, Save, FolderOpen, Download, ChevronDown, ChevronUp } from 'lucide-react';
 
 export function PlansPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [obsidianPath, setObsidianPath] = useState<string>('');
   const { data: todayPlan, isLoading: isLoadingToday } = useTodayPlan();
@@ -70,12 +72,30 @@ export function PlansPage() {
   const isLoading = selectedDate ? isLoadingSelected : isLoadingToday;
 
   return (
-    <div className="plans-page h-full flex gap-6 animate-fade-in">
-      {/* Sidebar - Plan List */}
-      <div className="w-80 flex flex-col gap-4">
-        {/* Action Buttons */}
-        <div className="flex gap-2">
+    <PageTransition>
+      <div className="plans-page h-full flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Mobile Toggle */}
+        <div className="lg:hidden">
           <GlassButton
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="w-full"
+            size="sm"
+          >
+            <span className="flex items-center justify-between w-full">
+              <span className="flex items-center gap-2">
+                <FolderOpen size={16} />
+                Planlar
+              </span>
+              {sidebarOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </span>
+          </GlassButton>
+        </div>
+
+        {/* Sidebar - Plan List */}
+        <div className={`${sidebarOpen ? 'flex' : 'hidden'} lg:flex w-full lg:w-80 flex-col gap-4`}>
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <GlassButton
             onClick={handleGeneratePlan}
             disabled={generatePlan.isPending}
             className="flex-1"
@@ -137,7 +157,7 @@ export function PlansPage() {
           </div>
           
           {/* Editor */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden min-h-[400px] lg:min-h-0">
             {isLoading ? (
               <div className="h-full flex items-center justify-center">
                 <Loader2 size={32} className="animate-spin text-accent" />
@@ -152,5 +172,6 @@ export function PlansPage() {
         </GlassCard>
       </div>
     </div>
+    </PageTransition>
   );
 }

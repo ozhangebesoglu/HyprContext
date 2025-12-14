@@ -7,10 +7,12 @@
 import { GlassCard } from '../components/glass/GlassCard';
 import { ActivityFeed } from '../components/features/ActivityFeed';
 import { ChatWidget } from '../components/features/ChatWidget';
+import { PageTransition } from '../components/layout/PageTransition';
 
 export function CommentsPage() {
   return (
-    <div className="comments-page h-full flex gap-4">
+    <PageTransition>
+    <div className="comments-page h-full flex flex-col lg:flex-row gap-4">
       {/* Main Feed */}
       <div className="flex-1 overflow-hidden">
         <GlassCard className="h-full flex flex-col">
@@ -30,9 +32,10 @@ export function CommentsPage() {
       </div>
 
       {/* Chat Sidebar */}
-      <div className="w-96 hidden xl:block">
+      <div className="w-full lg:w-96 hidden lg:block">
         <ChatWidget />
       </div>
     </div>
+    </PageTransition>
   );
 }

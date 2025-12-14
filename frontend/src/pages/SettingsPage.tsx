@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/glass/GlassCard';
 import { GlassButton } from '../components/ui/glass-button';
 import { GlassInput } from '../components/ui/glass-input';
+import { PageTransition } from '../components/layout/PageTransition';
 import { 
   Settings, User, Shield, 
   Save, Loader2, Plus, X, Clock, BookOpen, FolderOpen
@@ -95,7 +96,8 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="settings-page h-full overflow-auto animate-fade-in">
+    <PageTransition>
+    <div className="settings-page h-full overflow-auto">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
         <div>
@@ -309,6 +311,7 @@ export function SettingsPage() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }
 

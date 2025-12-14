@@ -8,6 +8,7 @@ import { GlassCard } from '../components/glass/GlassCard';
 import { ActivityChart } from '../components/features/ActivityChart';
 import { TagCloud } from '../components/features/TagCloud';
 import { TimelineChart } from '../components/features/TimelineChart';
+import { PageTransition } from '../components/layout/PageTransition';
 import { useFocusStats, useActivityStats } from '../hooks/useApi';
 import { BarChart3, Target, Clock, Zap, TrendingUp, Activity } from 'lucide-react';
 
@@ -16,7 +17,8 @@ export function GraphsPage() {
   const { data: activityStats } = useActivityStats();
 
   return (
-    <div className="graphs-page h-full overflow-auto animate-fade-in">
+    <PageTransition>
+    <div className="graphs-page h-full overflow-auto">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
         <div>
@@ -31,7 +33,7 @@ export function GraphsPage() {
       </header>
 
       {/* Quick Stats Row */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <QuickStat
           icon={<Activity size={20} />}
           label="Bugünkü Aktivite"
@@ -118,6 +120,7 @@ export function GraphsPage() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }
 

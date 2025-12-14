@@ -10,15 +10,17 @@ import { GlassButton } from '../components/ui/glass-button';
 import { GlassModal } from '../components/glass/GlassModal';
 import { ReportList } from '../components/features/ReportList';
 import { ReportViewer } from '../components/features/ReportViewer';
+import { PageTransition } from '../components/layout/PageTransition';
 import { useGenerateReport, useExportReport, useReports, useReport } from '../hooks/useApi';
 import { useSystemStore } from '../stores/systemStore';
-import { FileText, Download, Loader2, AlertCircle, FileOutput, FolderOpen } from 'lucide-react';
+import { FileText, Download, Loader2, AlertCircle, FileOutput, FolderOpen, ChevronDown, ChevronUp } from 'lucide-react';
 
 export function ReportsPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportPath, setExportPath] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const { data: reports, isLoading } = useReports();
   const { data: selectedReport, isLoading: isLoadingReport } = useReport(selectedDate || '');
@@ -72,20 +74,38 @@ export function ReportsPage() {
   const reportSummary = reports?.find((r: any) => r.date === selectedDate)?.summary;
 
   return (
-    <div className="reports-page h-full flex gap-6 animate-fade-in">
-      {/* Sidebar - Report List */}
-      <div className="w-80 flex flex-col gap-4">
-        {/* Action Button */}
-        <GlassButton
-          onClick={handleGenerateClick}
-          disabled={generateReport.isPending}
-          size="sm"
-        >
-          <span className="flex items-center gap-2">
-            {generateReport.isPending ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <FileText size={16} />
+    <PageTransition>
+      <div className="reports-page h-full flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Mobile Toggle */}
+        <div className="lg:hidden">
+          <GlassButton
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="w-full"
+            size="sm"
+          >
+            <span className="flex items-center justify-between w-full">
+              <span className="flex items-center gap-2">
+                <FolderOpen size={16} />
+                Raporlar
+              </span>
+              {sidebarOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </span>
+          </GlassButton>
+        </div>
+
+        {/* Sidebar - Report List */}
+        <div className={`${sidebarOpen ? 'flex' : 'hidden'} lg:flex w-full lg:w-80 flex-col gap-4`}>
+          {/* Action Button */}
+          <GlassButton
+            onClick={handleGenerateClick}
+            disabled={generateReport.isPending}
+            size="sm"
+          >
+            <span className="flex items-center gap-2">
+              {generateReport.isPending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <FileText size={16} />
             )}
             Bugünü Raporla
           </span>
@@ -133,7 +153,7 @@ export function ReportsPage() {
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-auto p-6">
+          <div className="flex-1 overflow-auto p-6 min-h-[400px] lg:min-h-0">
             {isLoadingReport ? (
               <div className="h-full flex items-center justify-center">
                 <Loader2 size={32} className="animate-spin text-accent" />
@@ -237,5 +257,6 @@ export function ReportsPage() {
         </div>
       </GlassModal>
     </div>
+    </PageTransition>
   );
 }
