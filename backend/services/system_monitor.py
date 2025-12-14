@@ -146,3 +146,7 @@ class SystemMonitorService:
     def is_available(self) -> bool:
         """Servis kullanılabilir mi?"""
         return PSUTIL_AVAILABLE
+
+
+
+

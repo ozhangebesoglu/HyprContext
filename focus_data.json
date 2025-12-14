@@ -54,5 +54,25 @@
     "distraction_seconds": 1,
     "warnings_sent": [],
     "limit_reached": false
+  },
+  "2025-12-11": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-12": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-13": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
+  },
+  "2025-12-14": {
+    "distraction_seconds": 0,
+    "warnings_sent": [],
+    "limit_reached": false
   }
 }

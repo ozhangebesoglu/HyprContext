@@ -197,3 +197,7 @@ async def update_banned_keywords(keywords: list[str]):
         return {"success": True, "keywords": keywords}
     except Exception as e:
         raise HTTPException(500, f"Yasaklı kelimeler kaydedilemedi: {str(e)}")
+
+
+
+

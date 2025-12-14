@@ -7,7 +7,7 @@ Open/Closed Principle: Yeni model eklemek için bu interface'i implement et.
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Iterator, Union
 
 
 class IAIClient(ABC):
@@ -46,4 +46,21 @@ class IAIClient(ABC):
     @abstractmethod
     def is_available(self) -> bool:
         """Modelin kullanılabilir olup olmadığını kontrol et."""
+        pass
+    
+    @abstractmethod
+    def chat(
+        self, 
+        messages: list[dict], 
+        stream: bool = False
+    ) -> Union[str, Iterator[str]]:
+        """Chat completion (streaming destekli).
+        
+        Args:
+            messages: Mesaj listesi [{"role": "user", "content": "..."}]
+            stream: Streaming açık mı
+            
+        Returns:
+            Yanıt (streaming ise Iterator, değilse str)
+        """
         pass

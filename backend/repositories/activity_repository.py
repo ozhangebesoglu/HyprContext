@@ -7,7 +7,7 @@ Aktivite verisi repository implementasyonu.
 
 import json
 import logging
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
@@ -92,9 +92,14 @@ class ActivityRepository(IActivityRepository):
             for result in results:
                 metadata = result.get("metadata", {})
                 if "timestamp" in metadata:
+                    # timestamp string ise datetime'a çevir
+                    ts = metadata["timestamp"]
+                    if isinstance(ts, str):
+                        ts = datetime.fromisoformat(ts)
+                    
                     activities.append(Activity(
                         id=metadata.get("id"),
-                        timestamp=metadata["timestamp"],
+                        timestamp=ts,
                         summary=result.get("document", ""),
                         tags=metadata.get("tags", [])
                     ))

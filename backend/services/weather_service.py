@@ -172,3 +172,7 @@ class WeatherService:
         """Önbelleği temizle."""
         self._cache = None
         self._cache_time = None
+
+
+
+

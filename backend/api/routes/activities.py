@@ -66,6 +66,27 @@ async def get_activities(
     ]
 
 
+@router.get("/today", response_model=list[ActivityResponse])
+async def get_today_activities(
+    activity_repo=Depends(get_activity_repository)
+):
+    """Bugünün aktivitelerini getir."""
+    from datetime import date as date_module
+    
+    today = date_module.today()
+    activities = activity_repo.get_by_date(today)
+    
+    return [
+        ActivityResponse(
+            id=act.id or "",
+            timestamp=act.timestamp.isoformat(),
+            summary=act.summary,
+            tags=act.tags
+        )
+        for act in activities
+    ]
+
+
 @router.get("/search")
 async def search_activities(
     q: str = Query(..., min_length=2, description="Arama sorgusu"),

@@ -13,6 +13,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import get_settings
+from .core.exceptions import (
+    HyprContextException,
+    hyprcontext_exception_handler,
+    generic_exception_handler
+)
 from .core.dependencies import (
     get_screenshot_capture,
     get_window_capture,
@@ -215,6 +220,10 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan
 )
+
+# Exception handlers
+app.add_exception_handler(HyprContextException, hyprcontext_exception_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
 
 
 # Startup event - background task'ları başlat

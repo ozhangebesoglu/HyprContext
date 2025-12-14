@@ -23,6 +23,18 @@ from ..adapters.chromadb_adapter import ChromaDBAdapter
 from ..adapters.notification_adapter import DesktopNotification, CompositeNotification, TTSNotification
 
 
+def clear_dependency_cache():
+    """Tüm bağımlılık cache'lerini temizle.
+    
+    Settings değiştiğinde çağrılmalı.
+    """
+    get_ai_client.cache_clear()
+    get_database.cache_clear()
+    get_notification.cache_clear()
+    get_screenshot_capture.cache_clear()
+    get_window_capture.cache_clear()
+
+
 @lru_cache()
 def get_ai_client() -> IAIClient:
     """AI client bağımlılığı.

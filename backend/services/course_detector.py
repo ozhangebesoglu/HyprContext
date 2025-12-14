@@ -341,3 +341,7 @@ class CourseDetectorService:
     def clear_notification_cache(self) -> None:
         """Bildirim önbelleğini temizle."""
         self._notified_courses.clear()
+
+
+
+

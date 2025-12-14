@@ -97,3 +97,15 @@ class FocusStats:
             return f"{minutes}dk {secs}sn"
         else:
             return f"{secs}sn"
+    
+    def to_dict(self) -> dict:
+        """Dict'e dönüştür."""
+        return {
+            "used_seconds": self.used_seconds,
+            "remaining_seconds": self.remaining_seconds,
+            "percentage": self.percentage,
+            "limit_reached": self.is_limit_reached,
+            "formatted_used": self.format_used(),
+            "formatted_remaining": self.format_remaining(),
+            "daily_limit_seconds": self.daily_limit_seconds,
+        }
