@@ -4,22 +4,66 @@
  * Plan yönetimi ve düzenleme.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/glass/GlassCard';
 import { GlassButton } from '../components/ui/glass-button';
 import { PlanEditor } from '../components/features/PlanEditor';
 import { PlanList } from '../components/features/PlanList';
-import { useGeneratePlan, useTodayPlan, usePlan } from '../hooks/useApi';
-import { Wand2, Loader2, Save, FolderOpen } from 'lucide-react';
+import { useGeneratePlan, useTodayPlan, usePlan, useExportPlan } from '../hooks/useApi';
+import { useSystemStore } from '../stores/systemStore';
+import { Wand2, Loader2, Save, FolderOpen, Download } from 'lucide-react';
 
 export function PlansPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [obsidianPath, setObsidianPath] = useState<string>('');
   const { data: todayPlan, isLoading: isLoadingToday } = useTodayPlan();
   const { data: selectedPlan, isLoading: isLoadingSelected } = usePlan(selectedDate || '');
   const generatePlan = useGeneratePlan();
+  const exportPlan = useExportPlan();
+  const addNotification = useSystemStore((state) => state.addNotification);
+
+  // Obsidian path'i profile'den al
+  useEffect(() => {
+    fetch('http://localhost:8000/api/profile')
+      .then(res => res.json())
+      .then(data => setObsidianPath(data.obsidian_vault || ''))
+      .catch(() => {});
+  }, []);
 
   const handleGeneratePlan = () => {
     generatePlan.mutate({});
+  };
+
+  const handleExport = () => {
+    const date = selectedDate || new Date().toISOString().split('T')[0];
+    if (!obsidianPath) {
+      addNotification({
+        type: 'warning',
+        title: 'Obsidian Dizini',
+        message: 'Ayarlardan Obsidian vault dizinini belirleyin.',
+      });
+      return;
+    }
+    
+    exportPlan.mutate(
+      { date, path: obsidianPath },
+      {
+        onSuccess: () => {
+          addNotification({
+            type: 'success',
+            title: 'Başarılı',
+            message: 'Plan Obsidian\'a aktarıldı.',
+          });
+        },
+        onError: () => {
+          addNotification({
+            type: 'error',
+            title: 'Hata',
+            message: 'Dışa aktarma başarısız oldu.',
+          });
+        },
+      }
+    );
   };
 
   const currentPlan = selectedDate ? selectedPlan : todayPlan;
@@ -74,9 +118,22 @@ export function PlansPage() {
               </div>
             </div>
             
-            <GlassButton title="Kaydet">
-              <Save size={18} />
-            </GlassButton>
+            <div className="flex gap-2">
+              <GlassButton 
+                onClick={handleExport} 
+                title="Obsidian'a Aktar"
+                disabled={exportPlan.isPending || !currentPlan}
+              >
+                {exportPlan.isPending ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Download size={18} />
+                )}
+              </GlassButton>
+              <GlassButton title="Kaydet">
+                <Save size={18} />
+              </GlassButton>
+            </div>
           </div>
           
           {/* Editor */}

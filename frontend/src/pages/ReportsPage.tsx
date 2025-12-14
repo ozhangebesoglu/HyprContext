@@ -4,25 +4,35 @@
  * Rapor görüntüleme ve oluşturma.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/glass/GlassCard';
 import { GlassButton } from '../components/ui/glass-button';
 import { GlassModal } from '../components/glass/GlassModal';
 import { ReportList } from '../components/features/ReportList';
 import { ReportViewer } from '../components/features/ReportViewer';
 import { useGenerateReport, useExportReport, useReports, useReport } from '../hooks/useApi';
+import { useSystemStore } from '../stores/systemStore';
 import { FileText, Download, Loader2, AlertCircle, FileOutput, FolderOpen } from 'lucide-react';
 
 export function ReportsPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
-  const [exportPath, setExportPath] = useState('/home/user/Obsidian/Vault/Raporlar/');
+  const [exportPath, setExportPath] = useState('');
   
   const { data: reports, isLoading } = useReports();
   const { data: selectedReport, isLoading: isLoadingReport } = useReport(selectedDate || '');
   const generateReport = useGenerateReport();
   const exportReport = useExportReport();
+  const addNotification = useSystemStore((state) => state.addNotification);
+
+  // Obsidian path'i profile'den al
+  useEffect(() => {
+    fetch('http://localhost:8000/api/profile')
+      .then(res => res.json())
+      .then(data => setExportPath(data.obsidian_vault || ''))
+      .catch(() => {});
+  }, []);
 
   const handleGenerateClick = () => {
     setShowConfirmModal(true);
@@ -35,8 +45,26 @@ export function ReportsPage() {
 
   const handleExport = () => {
     if (selectedDate && exportPath) {
-      exportReport.mutate({ date: selectedDate, path: exportPath });
-      setShowExportModal(false);
+      exportReport.mutate(
+        { date: selectedDate, path: exportPath },
+        {
+          onSuccess: () => {
+            setShowExportModal(false);
+            addNotification({
+              type: 'success',
+              title: 'Başarılı',
+              message: 'Rapor Obsidian\'a aktarıldı.',
+            });
+          },
+          onError: () => {
+            addNotification({
+              type: 'error',
+              title: 'Hata',
+              message: 'Dışa aktarma başarısız oldu.',
+            });
+          },
+        }
+      );
     }
   };
 

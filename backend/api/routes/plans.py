@@ -51,6 +51,11 @@ class UpdatePlanRequest(BaseModel):
     mission: Optional[str] = None
 
 
+class ExportRequest(BaseModel):
+    """Dışa aktarma isteği."""
+    path: str  # Obsidian vault dizini
+
+
 @router.get("/", response_model=list[PlanResponse])
 async def get_plans(
     plan_repo=Depends(get_plan_repository)
@@ -181,3 +186,52 @@ async def get_plan(
         weather=plan.weather,
         active_course=plan.active_course
     )
+
+
+@router.post("/{plan_date}/export")
+async def export_plan(
+    plan_date: str,
+    request: ExportRequest,
+    plan_repo=Depends(get_plan_repository)
+):
+    """Planı Obsidian'a aktar."""
+    import os
+    from pathlib import Path
+    
+    try:
+        target_date = date.fromisoformat(plan_date)
+    except ValueError:
+        raise HTTPException(400, "Geçersiz tarih formatı")
+    
+    plan = plan_repo.get_by_date(target_date)
+    if not plan:
+        raise HTTPException(404, "Plan bulunamadı")
+    
+    # Dizini genişlet (~ için)
+    export_path = Path(os.path.expanduser(request.path))
+    
+    # Dizin yoksa oluştur
+    export_path.mkdir(parents=True, exist_ok=True)
+    
+    # Dosya adı
+    filename = f"Plan_{plan_date}.md"
+    file_path = export_path / filename
+    
+    # Markdown içeriği oluştur
+    content = f"""# 📅 {plan_date} Planı
+
+## 🎯 Günün Misyonu
+{plan.mission or 'Belirtilmemiş'}
+
+{plan.content}
+
+---
+*HyprContext tarafından oluşturuldu*
+"""
+    
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        return {"success": True, "path": str(file_path)}
+    except Exception as e:
+        raise HTTPException(500, f"Dışa aktarma başarısız: {str(e)}")

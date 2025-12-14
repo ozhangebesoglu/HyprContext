@@ -28,6 +28,7 @@ class ProfileResponse(BaseModel):
     egitim_programi: Optional[dict] = None
     hedefler: Optional[dict] = None
     yasak_kelimeler: list[str] = []
+    obsidian_vault: Optional[str] = None
 
 
 class ProfileUpdateRequest(BaseModel):
@@ -39,6 +40,7 @@ class ProfileUpdateRequest(BaseModel):
     gun_baslangici: Optional[str] = None
     gun_bitisi: Optional[str] = None
     yasak_kelimeler: Optional[list[str]] = None
+    obsidian_vault: Optional[str] = None
 
 
 class CourseAddRequest(BaseModel):
@@ -66,7 +68,8 @@ async def get_profile():
         gun_bitisi=profile.get("gun_bitisi", "23:00"),
         egitim_programi=profile.get("egitim_programi"),
         hedefler=profile.get("hedefler"),
-        yasak_kelimeler=profile.get("yasak_kelimeler", [])
+        yasak_kelimeler=profile.get("yasak_kelimeler", []),
+        obsidian_vault=profile.get("obsidian_vault")
     )
 
 
@@ -94,6 +97,8 @@ async def update_profile(request: ProfileUpdateRequest):
         profile["gun_bitisi"] = request.gun_bitisi
     if request.yasak_kelimeler is not None:
         profile["yasak_kelimeler"] = request.yasak_kelimeler
+    if request.obsidian_vault is not None:
+        profile["obsidian_vault"] = request.obsidian_vault
     
     # Kaydet
     try:

@@ -10,7 +10,7 @@ import { GlassButton } from '../components/ui/glass-button';
 import { GlassInput } from '../components/ui/glass-input';
 import { 
   Settings, User, Shield, 
-  Save, Loader2, Plus, X, Clock, BookOpen
+  Save, Loader2, Plus, X, Clock, BookOpen, FolderOpen
 } from 'lucide-react';
 
 interface Profile {
@@ -23,6 +23,7 @@ interface Profile {
   };
   banned_keywords: string[];
   courses: Array<{ name: string; platform: string; progress: number }>;
+  obsidian_vault?: string;
 }
 
 export function SettingsPage() {
@@ -273,6 +274,36 @@ export function SettingsPage() {
                   Henüz kurs eklenmedi
                 </p>
               )}
+            </div>
+          </GlassCard>
+        </div>
+
+        {/* Obsidian Settings */}
+        <div className="col-span-12">
+          <GlassCard className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="stat-icon">
+                <FolderOpen size={18} />
+              </div>
+              <h3 className="text-lg font-semibold text-primary">Obsidian Entegrasyonu</h3>
+            </div>
+
+            <div className="space-y-4">
+              <GlassInput
+                label="Obsidian Vault Dizini"
+                icon={<FolderOpen size={18} />}
+                value={profile?.obsidian_vault || ''}
+                onChange={(e) => setProfile(profile ? {
+                  ...profile,
+                  obsidian_vault: e.target.value
+                } : null)}
+                placeholder="~/SecondBrain veya tam dizin yolu..."
+              />
+              
+              <p className="text-xs text-muted pl-3">
+                Plan ve raporları bu dizine .md dosyası olarak aktarabilirsiniz.
+                Örnek: ~/SecondBrain, ~/Documents/Obsidian
+              </p>
             </div>
           </GlassCard>
         </div>

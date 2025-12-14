@@ -147,6 +147,16 @@ export function useExportReport() {
   });
 }
 
+export function useExportPlan() {
+  return useMutation({
+    mutationFn: ({ date, path }: { date: string; path: string }) =>
+      fetchApi(`/plans/${date}/export`, {
+        method: 'POST',
+        body: JSON.stringify({ path }),
+      }),
+  });
+}
+
 // Focus
 export function useFocusStats() {
   return useQuery<FocusStats>({
