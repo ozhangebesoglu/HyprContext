@@ -7,15 +7,116 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain } = require('electron');
 const path = require('path');
 const http = require('http');
+const { spawn } = require('child_process');
+const fs = require('fs');
 
 let mainWindow = null;
 let tray = null;
 let isCapturing = false;
+let backendProcess = null;
 
 // DÜZELTİLDİ: Uygulama paketlenmişse (AppImage) production modunda çalışır.
 const isDev = !app.isPackaged;
 
 const API_BASE = 'http://localhost:8000/api';
+
+// --- Backend Yönetimi ---
+
+function getBackendPath() {
+  if (isDev) {
+    // Dev modunda Python ile çalıştır
+    return null;
+  }
+  
+  // Windows için .exe uzantısı
+  const ext = process.platform === 'win32' ? '.exe' : '';
+  const execName = `hyprcontext-backend${ext}`;
+  
+  // Production modunda derlenmiş backend
+  const possiblePaths = [
+    path.join(process.resourcesPath, 'backend-dist', execName),
+    path.join(__dirname, '..', 'backend-dist', execName),
+    path.join(app.getAppPath(), 'backend-dist', execName),
+  ];
+  
+  for (const p of possiblePaths) {
+    console.log('Backend aranıyor:', p);
+    if (fs.existsSync(p)) {
+      console.log('Backend bulundu:', p);
+      return p;
+    }
+  }
+  
+  console.error('Backend bulunamadı. Aranan yerler:', possiblePaths);
+  return null;
+}
+
+async function startBackend() {
+  const backendPath = getBackendPath();
+  
+  if (isDev) {
+    console.log('Dev modu: Backend manuel başlatılmalı (uvicorn backend.main:app --port 8000)');
+    return true;
+  }
+  
+  if (!backendPath) {
+    console.error('Backend executable bulunamadı!');
+    return false;
+  }
+  
+  console.log('Backend başlatılıyor:', backendPath);
+  
+  return new Promise((resolve) => {
+    backendProcess = spawn(backendPath, [], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: false,
+    });
+    
+    backendProcess.stdout.on('data', (data) => {
+      console.log('[Backend]', data.toString());
+    });
+    
+    backendProcess.stderr.on('data', (data) => {
+      console.error('[Backend Error]', data.toString());
+    });
+    
+    backendProcess.on('error', (err) => {
+      console.error('Backend başlatılamadı:', err);
+      resolve(false);
+    });
+    
+    backendProcess.on('exit', (code) => {
+      console.log('Backend kapandı, exit code:', code);
+      backendProcess = null;
+    });
+    
+    // Backend'in hazır olmasını bekle
+    let attempts = 0;
+    const checkBackend = setInterval(async () => {
+      attempts++;
+      try {
+        await apiRequest('/health');
+        console.log('Backend hazır!');
+        clearInterval(checkBackend);
+        resolve(true);
+      } catch {
+        if (attempts > 30) { // 15 saniye
+          console.error('Backend hazır olmadı, timeout!');
+          clearInterval(checkBackend);
+          resolve(false);
+        }
+      }
+    }, 500);
+  });
+}
+
+function stopBackend() {
+  if (backendProcess) {
+    console.log('Backend durduruluyor...');
+    backendProcess.kill();
+    backendProcess = null;
+  }
+}
 
 // --- Yardımcı Fonksiyonlar ---
 
@@ -87,9 +188,20 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   } else {
     console.log('Production Modu: index.html yükleniyor...');
-    // dist klasöründeki dosyayı yükle
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    // __dirname AppImage içinde resources/app.asar/electron olur
+    const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
+    console.log('Index path:', indexPath);
+    mainWindow.loadFile(indexPath);
   }
+  
+  // Web içeriği yüklendiğinde kontrol et
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Sayfa yüklenemedi:', errorCode, errorDescription);
+  });
+  
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('Sayfa başarıyla yüklendi');
+  });
 
   mainWindow.on('close', (event) => {
     if (!app.isQuitting) {
@@ -217,7 +329,17 @@ function updateTrayMenu() {
 
 // --- Uygulama Döngüsü ---
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // Backend'i başlat
+  console.log('Backend başlatılıyor...');
+  const backendStarted = await startBackend();
+  
+  if (!backendStarted) {
+    console.error('Backend başlatılamadı, uygulama yine de açılıyor...');
+  } else {
+    console.log('Backend başarıyla başlatıldı');
+  }
+  
   createWindow();
   createTray();
   
@@ -234,6 +356,11 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+});
+
+// Uygulama kapanmadan önce backend'i durdur
+app.on('before-quit', () => {
+  stopBackend();
 });
 
 app.on('window-all-closed', () => {

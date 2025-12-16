@@ -68,6 +68,13 @@
       "electron/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "backend-dist",
+        "to": "backend-dist",
+        "filter": ["**/*"]
+      }
+    ],
     "linux": {
       "target": [
         "AppImage"
