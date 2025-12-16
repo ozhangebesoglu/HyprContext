@@ -2,7 +2,14 @@
   "name": "hyprcontext-desktop",
   "version": "0.1.0",
   "description": "HyprContext Desktop Application",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
+  "author": {
+    "email": "ozhan.gebesoglu@gmail.com",
+    "name": "Ozhan Gebesoglu",
+    "url": "https://ozhangebesoglu.com"
+  },
+  "homepage": "",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -52,6 +59,11 @@
     "directories": {
       "output": "dist-electron"
     },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
     "linux": {
       "target": [
         "AppImage",

@@ -71,53 +71,59 @@ async def capture_loop():
     
     logger.info(f"Capture loop başlatıldı (interval: {settings.screenshot_interval}s)")
     
-    while True:
-        try:
-            # Screenshot al
-            result = screenshot_capture.capture()
-            
-            if result.success:
-                # Pencere bilgilerini al
-                active_window = window_capture.get_active_window()
-                all_windows = window_capture.get_all_windows()
+    try:
+        while True:
+            try:
+                # Screenshot al
+                result = screenshot_capture.capture()
                 
-                # Kurs tespiti yap
-                course = course_detector.detect_course()
-                if course:
-                    course_detector.send_course_notification(course)
-                
-                # Analiz et
-                analysis = analyzer.analyze(
-                    screenshot=result.data,
-                    active_window=active_window,
-                    all_windows=all_windows
-                )
-                
-                if analysis.success:
-                    # Activity oluştur ve kaydet
-                    from datetime import datetime
-                    activity = Activity(
-                        timestamp=datetime.now(),
-                        summary=analysis.summary,
-                        tags=analysis.tags,
-                        active_window=active_window.app_class if active_window else None
+                if result.success:
+                    # Pencere bilgilerini al
+                    active_window = window_capture.get_active_window()
+                    all_windows = window_capture.get_all_windows()
+                    
+                    # Kurs tespiti yap
+                    course = course_detector.detect_course()
+                    if course:
+                        course_detector.send_course_notification(course)
+                    
+                    # Analiz et
+                    analysis = analyzer.analyze(
+                        screenshot=result.data,
+                        active_window=active_window,
+                        all_windows=all_windows
                     )
                     
-                    activity_repo.save(activity)
-                    
-                    # WebSocket ile broadcast et
-                    await broadcast_activity(activity.to_dict())
-                    
-                    logger.info(f"Aktivite kaydedildi: {activity.summary[:50]}...")
+                    if analysis.success:
+                        # Activity oluştur ve kaydet
+                        from datetime import datetime
+                        activity = Activity(
+                            timestamp=datetime.now(),
+                            summary=analysis.summary,
+                            tags=analysis.tags,
+                            active_window=active_window.app_class if active_window else None
+                        )
+                        
+                        activity_repo.save(activity)
+                        
+                        # WebSocket ile broadcast et
+                        await broadcast_activity(activity.to_dict())
+                        
+                        logger.info(f"Aktivite kaydedildi: {activity.summary[:50]}...")
+                    else:
+                        logger.warning(f"Analiz başarısız: {analysis.error_message}")
                 else:
-                    logger.warning(f"Analiz başarısız: {analysis.error_message}")
-            else:
-                logger.warning(f"Screenshot başarısız: {result.error_message}")
-                
-        except Exception as e:
-            logger.error(f"Capture loop hatası: {e}")
-        
-        await asyncio.sleep(settings.screenshot_interval)
+                    logger.warning(f"Screenshot başarısız: {result.error_message}")
+                    
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                logger.error(f"Capture loop hatası: {e}")
+            
+            await asyncio.sleep(settings.screenshot_interval)
+    except asyncio.CancelledError:
+        logger.info("Capture loop durduruldu")
+        raise
 
 
 async def focus_loop():
@@ -126,45 +132,51 @@ async def focus_loop():
     
     logger.info("Focus loop başlatıldı")
     
-    while True:
-        try:
-            # Dikkat dağınıklığı kontrolü
-            is_distracted, keyword = focus_service.check_distraction()
-            
-            if is_distracted:
-                # Süreyi artır
-                data = focus_service.increment_distraction(seconds=1)
+    try:
+        while True:
+            try:
+                # Dikkat dağınıklığı kontrolü
+                is_distracted, keyword = focus_service.check_distraction()
                 
-                # İstatistikleri al
-                stats = focus_service.get_stats()
-                
-                # Uyarı kontrolü ve WebSocket broadcast
-                warning_sent = focus_service.check_and_warn(data)
-                
-                if warning_sent:
-                    # Uyarı gönderildi - WebSocket'e de bildir
-                    await broadcast_distraction_warning({
+                if is_distracted:
+                    # Süreyi artır
+                    data = focus_service.increment_distraction(seconds=1)
+                    
+                    # İstatistikleri al
+                    stats = focus_service.get_stats()
+                    
+                    # Uyarı kontrolü ve WebSocket broadcast
+                    warning_sent = focus_service.check_and_warn(data)
+                    
+                    if warning_sent:
+                        # Uyarı gönderildi - WebSocket'e de bildir
+                        await broadcast_distraction_warning({
+                            "keyword": keyword,
+                            "used_seconds": stats.used_seconds,
+                            "remaining_seconds": stats.remaining_seconds,
+                            "percentage": stats.percentage,
+                            "limit_reached": data.limit_reached,
+                            "message": f"Yasaklı uygulamalarda {stats.format_used()} geçirdin!"
+                        })
+                    
+                    # Normal durum güncellemesi
+                    await broadcast_focus_update({
+                        "is_distracted": True,
                         "keyword": keyword,
                         "used_seconds": stats.used_seconds,
                         "remaining_seconds": stats.remaining_seconds,
-                        "percentage": stats.percentage,
-                        "limit_reached": data.limit_reached,
-                        "message": f"Yasaklı uygulamalarda {stats.format_used()} geçirdin!"
+                        "percentage": stats.percentage
                     })
-                
-                # Normal durum güncellemesi
-                await broadcast_focus_update({
-                    "is_distracted": True,
-                    "keyword": keyword,
-                    "used_seconds": stats.used_seconds,
-                    "remaining_seconds": stats.remaining_seconds,
-                    "percentage": stats.percentage
-                })
-                
-        except Exception as e:
-            logger.error(f"Focus loop hatası: {e}")
-        
-        await asyncio.sleep(1)  # Her saniye kontrol
+                    
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                logger.error(f"Focus loop hatası: {e}")
+            
+            await asyncio.sleep(1)  # Her saniye kontrol
+    except asyncio.CancelledError:
+        logger.info("Focus loop durduruldu")
+        raise
 
 
 async def system_monitor_loop():
@@ -226,25 +238,19 @@ app.add_exception_handler(HyprContextException, hyprcontext_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
 
-# Startup event - background task'ları başlat
+# Startup event - sadece system monitor başlat, capture/focus kullanıcı tarafından başlatılacak
 @app.on_event("startup")
 async def start_background_tasks():
     """Background task'ları sunucu hazır olduktan sonra başlat."""
-    global _capture_task, _focus_task, _system_monitor_task
+    global _system_monitor_task
     
     # Biraz bekle ki sunucu tamamen hazır olsun
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
     
-    # Background task'ları başlat
-    _capture_task = asyncio.create_task(capture_loop())
-    _focus_task = asyncio.create_task(focus_loop())
+    # Sadece system monitor'u başlat (capture/focus kullanıcı kontrolünde)
     _system_monitor_task = asyncio.create_task(system_monitor_loop())
     
-    # Control modülündeki durumu güncelle
-    from .api.routes.control import set_running_state
-    set_running_state(True)
-    
-    logger.info("Background tasks başlatıldı")
+    logger.info("System monitor başlatıldı. Capture/Focus kullanıcı tarafından başlatılacak.")
 
 
 # CORS

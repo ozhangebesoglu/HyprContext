@@ -156,14 +156,24 @@ async def stop_services():
     try:
         import backend.main as main_module
         
-        # Task'ları iptal et
-        if main_module._capture_task:
-            main_module._capture_task.cancel()
-            main_module._capture_task = None
+        # Task'ları iptal et ve tamamlanmasını bekle
+        tasks_to_cancel = []
         
-        if main_module._focus_task:
+        if main_module._capture_task and not main_module._capture_task.done():
+            main_module._capture_task.cancel()
+            tasks_to_cancel.append(main_module._capture_task)
+        
+        if main_module._focus_task and not main_module._focus_task.done():
             main_module._focus_task.cancel()
-            main_module._focus_task = None
+            tasks_to_cancel.append(main_module._focus_task)
+        
+        # İptal edilen task'ların bitmesini bekle
+        if tasks_to_cancel:
+            await asyncio.gather(*tasks_to_cancel, return_exceptions=True)
+        
+        # Referansları temizle
+        main_module._capture_task = None
+        main_module._focus_task = None
         
         set_running_state(False)
         logger.info("Servisler manuel olarak durduruldu")
