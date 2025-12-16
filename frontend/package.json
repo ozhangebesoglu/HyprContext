@@ -8,7 +8,11 @@
     "name": "Ozhan Gebesoglu",
     "url": "https://ozhangebesoglu.com"
   },
-  "homepage": "",
+  "homepage": "https://github.com/ozhangebesoglu/HyprContext",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ozhangebesoglu/HyprContext.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
