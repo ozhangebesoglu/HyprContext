@@ -6,6 +6,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -26,7 +29,7 @@ jobs:
 
       - name: Build Electron App (Linux)
         working-directory: frontend
-        run: npm run electron:build
+        run: npm run electron:build -- --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -57,7 +60,7 @@ jobs:
 
       - name: Build Electron App (Windows)
         working-directory: frontend
-        run: npm run electron:build
+        run: npm run electron:build -- --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
