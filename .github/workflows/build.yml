@@ -30,8 +30,24 @@ jobs:
 
       - name: Build Backend Executable
         run: |
-          cd backend
+          # Proje kökünden çalıştır, tüm backend paketini dahil et
           pyinstaller --onefile --name hyprcontext-backend \
+            --paths=. \
+            --hidden-import=backend \
+            --hidden-import=backend.main \
+            --hidden-import=backend.core \
+            --hidden-import=backend.core.config \
+            --hidden-import=backend.core.dependencies \
+            --hidden-import=backend.core.exceptions \
+            --hidden-import=backend.api \
+            --hidden-import=backend.api.routes \
+            --hidden-import=backend.api.websocket \
+            --hidden-import=backend.adapters \
+            --hidden-import=backend.interfaces \
+            --hidden-import=backend.models \
+            --hidden-import=backend.repositories \
+            --hidden-import=backend.services \
+            --hidden-import=uvicorn \
             --hidden-import=uvicorn.logging \
             --hidden-import=uvicorn.loops \
             --hidden-import=uvicorn.loops.auto \
@@ -42,11 +58,13 @@ jobs:
             --hidden-import=uvicorn.protocols.websockets.auto \
             --hidden-import=uvicorn.lifespan \
             --hidden-import=uvicorn.lifespan.on \
-            --add-data "../profile.yaml:." \
-            --add-data "../hafiza_db:hafiza_db" \
-            main.py
-          mkdir -p ../frontend/backend-dist
-          cp dist/hyprcontext-backend ../frontend/backend-dist/
+            --collect-submodules=backend \
+            --add-data "profile.yaml:." \
+            --add-data "hafiza_db:hafiza_db" \
+            --add-data "backend:backend" \
+            backend/entry.py
+          mkdir -p frontend/backend-dist
+          cp dist/hyprcontext-backend frontend/backend-dist/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -94,8 +112,24 @@ jobs:
       - name: Build Backend Executable
         shell: bash
         run: |
-          cd backend
+          # Proje kökünden çalıştır, tüm backend paketini dahil et (Windows ; kullanır)
           pyinstaller --onefile --name hyprcontext-backend \
+            --paths=. \
+            --hidden-import=backend \
+            --hidden-import=backend.main \
+            --hidden-import=backend.core \
+            --hidden-import=backend.core.config \
+            --hidden-import=backend.core.dependencies \
+            --hidden-import=backend.core.exceptions \
+            --hidden-import=backend.api \
+            --hidden-import=backend.api.routes \
+            --hidden-import=backend.api.websocket \
+            --hidden-import=backend.adapters \
+            --hidden-import=backend.interfaces \
+            --hidden-import=backend.models \
+            --hidden-import=backend.repositories \
+            --hidden-import=backend.services \
+            --hidden-import=uvicorn \
             --hidden-import=uvicorn.logging \
             --hidden-import=uvicorn.loops \
             --hidden-import=uvicorn.loops.auto \
@@ -106,11 +140,13 @@ jobs:
             --hidden-import=uvicorn.protocols.websockets.auto \
             --hidden-import=uvicorn.lifespan \
             --hidden-import=uvicorn.lifespan.on \
-            --add-data "../profile.yaml;." \
-            --add-data "../hafiza_db;hafiza_db" \
-            main.py
-          mkdir -p ../frontend/backend-dist
-          cp dist/hyprcontext-backend.exe ../frontend/backend-dist/
+            --collect-submodules=backend \
+            --add-data "profile.yaml;." \
+            --add-data "hafiza_db;hafiza_db" \
+            --add-data "backend;backend" \
+            backend/entry.py
+          mkdir -p frontend/backend-dist
+          cp dist/hyprcontext-backend.exe frontend/backend-dist/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
