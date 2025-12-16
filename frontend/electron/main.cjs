@@ -163,15 +163,21 @@ async function updateCaptureStatus() {
 // --- Pencere ve Tray Yönetimi ---
 
 function createWindow() {
+  // Platform bazlı pencere ayarları
+  const isMac = process.platform === 'darwin';
+  
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1000,
     minHeight: 700,
-    frame: false, // Özel başlık çubuğu için çerçevesiz
-    transparent: true, 
-    vibrancy: 'under-window', 
-    visualEffectState: 'active',
+    // Tüm platformlarda çerçevesiz pencere (özel butonlar için)
+    frame: false,
+    titleBarStyle: isMac ? 'hiddenInset' : 'default',
+    transparent: isMac ? true : false,
+    vibrancy: isMac ? 'under-window' : undefined,
+    visualEffectState: isMac ? 'active' : undefined,
+    backgroundColor: '#0a0a0f',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -370,6 +376,25 @@ app.on('window-all-closed', () => {
 });
 
 // --- IPC Handlers ---
+
+// Pencere kontrolleri
+ipcMain.on('window:minimize', () => {
+  if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.on('window:maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
+ipcMain.on('window:close', () => {
+  if (mainWindow) mainWindow.close();
+});
 
 ipcMain.handle('get-capture-status', async () => {
   try {
