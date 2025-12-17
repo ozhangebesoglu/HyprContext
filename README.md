@@ -188,6 +188,3 @@ MIT License - Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
 ---
 
-<p align="center">
-  <sub>Made with ❤️ for productivity enthusiasts</sub>
-</p>
