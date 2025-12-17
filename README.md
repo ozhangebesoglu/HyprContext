@@ -1,154 +1,193 @@
-# HyprContext - Windows Edition
+<p align="center">
+  <img src="docs/screenshots/App_Photos/anasayfa.png" alt="HyprContext" width="600">
+</p>
 
-Windows için ekran aktivite izleme ve AI analiz aracı.
+<h1 align="center">🌟 HyprContext</h1>
 
-## 🚀 Özellikler
+<p align="center">
+  <strong>Yapay Zeka Destekli Akıllı Üretkenlik Takip Asistanı</strong>
+</p>
 
-- **Ekran Görüntüsü Alma:** Windows API ile otomatik screenshot
-- **Pencere Takibi:** Aktif ve arka plan pencerelerini izleme
-- **AI Analiz:** Ollama ile akıllı aktivite yorumlama
-- **Odak Takibi:** Dikkat dağınıklığı uyarıları
-- **Veritabanı:** SQLite ile yerel kayıt
-- **Bildirimler:** Windows toast bildirimleri ve sesli uyarı
+<p align="center">
+  <a href="https://github.com/ozhangebesoglu/HyprContext/releases"><img src="https://img.shields.io/github/v/release/ozhangebesoglu/HyprContext?style=for-the-badge&color=a855f7" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License"></a>
+  <a href="#"><img src="https://img.shields.io/badge/platform-Linux-orange?style=for-the-badge" alt="Platform"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Hyprland-Ready-00ff88?style=for-the-badge" alt="Hyprland"></a>
+</p>
 
-## 📋 Gereksinimler
+<p align="center">
+  <em>Yerel AI ile çalışan, gizlilik odaklı masaüstü aktivite takip uygulaması</em>
+</p>
 
-- Windows 10/11
-- Python 3.10+
-- [Ollama](https://ollama.ai/) (AI modeli için)
+---
 
-## 🛠️ Kurulum
+## 💎 Nedir?
 
-### 1. Ollama Kurulumu
-```powershell
-# Ollama'yı https://ollama.ai adresinden indirin
-# Kurulumdan sonra model indirin:
-ollama pull gemma3:4b
+HyprContext, bilgisayar aktivitelerinizi **yerel yapay zeka** ile analiz eden ve üretkenliğinizi artırmanıza yardımcı olan bir masaüstü uygulamasıdır.
+
+> 🔒 **Gizlilik Öncelikli**: Tüm verileriniz cihazınızda kalır. Bulut yok, veri paylaşımı yok.
+
+## ✨ Temel Özellikler
+
+| Özellik | Açıklama |
+|---------|----------|
+| 🤖 **AI Analiz** | Ollama ile yerel analiz, internet gerektirmez |
+| 📸 **Akıllı Takip** | 30 saniyelik periyotlarla ekran analizi |
+| 📊 **Detaylı Raporlar** | Günlük, haftalık aktivite özetleri |
+| 📅 **Plan Yönetimi** | AI destekli günlük planlama |
+| ⏱️ **Odak Modu** | Dikkat dağıtıcı uygulama takibi |
+| 💬 **AI Sohbet** | Aktiviteleriniz hakkında soru sorun |
+| 🎨 **Liquid Glass UI** | Modern, şık cam efektli arayüz |
+
+## 📸 Ekran Görüntüleri
+
+<details>
+<summary><strong>🖼️ Görüntüleri Göster</strong></summary>
+
+| Ana Sayfa | Grafikler |
+|-----------|-----------|
+| ![Ana Sayfa](docs/screenshots/App_Photos/anasayfa.png) | ![Grafikler](docs/screenshots/App_Photos/grafikler.png) |
+
+| Planlar | Raporlar |
+|---------|----------|
+| ![Planlar](docs/screenshots/App_Photos/planlar.png) | ![Raporlar](docs/screenshots/App_Photos/raporlar.png) |
+
+| Canlı Aktivite | Ayarlar |
+|----------------|---------|
+| ![Canlı](docs/screenshots/App_Photos/canliaktivite.png) | ![Ayarlar](docs/screenshots/App_Photos/ayarlar.png) |
+
+| İlk Kurulum |
+|-------------|
+| ![Setup](docs/screenshots/App_Photos/setup1.png) |
+
+</details>
+
+---
+
+## 🚀 Hızlı Başlangıç (Linux)
+
+### Gereksinimler
+
+- Linux (Arch, Fedora, Ubuntu)
+- Hyprland veya herhangi bir Wayland WM
+- [Ollama](https://ollama.ai/) (AI için)
+- `grim` (screenshot için)
+
+### Kurulum
+
+```bash
+# 1. Ollama'yı kur
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# 2. AI modellerini indir
+ollama pull gemma3
+ollama pull mxbai-embed-large
+
+# 3. grim kur (Arch)
+sudo pacman -S grim
+
+# 4. AppImage'ı indir ve çalıştır
+chmod +x HyprContext-*.AppImage
+./HyprContext-*.AppImage
 ```
 
-### 2. Proje Kurulumu
-```powershell
-# Repo'yu klonlayın
-git clone -b windows https://github.com/KULLANICI_ADI/HyprContext.git
-cd HyprContext
+### İlk Çalıştırma
 
-# Kurulum scriptini çalıştırın
-install.bat
-```
+1. **Veri klasörünü seçin** (varsayılan: `~/Documents/HyprContext`)
+2. **Kurulumu tamamlayın**
+3. **Tray'dan "Başlat"** ile takibi aktifleştirin
 
-### 3. Konfigürasyon
-```powershell
-# .env dosyası oluşturun
-copy config.example.env .env
+---
 
-# .env dosyasını düzenleyin (opsiyonel)
-notepad .env
-```
-
-## 🎯 Kullanım
-
-### Daemon Başlatma (Ana Mod)
-```powershell
-# Aktivasyon ve çalıştırma
-run.bat
-
-# Veya manuel:
-venv\Scripts\activate
-python main.py run
-```
-
-### CLI Komutları
-```powershell
-# Tek seferlik ekran yakalama
-python main.py capture
-
-# İstatistikleri görüntüle
-python main.py stats
-
-# Son aktiviteleri listele
-python main.py recent --limit 10
-
-# Aktivitelerde arama
-python main.py search "Visual Studio"
-
-# Odak durumunu göster
-python main.py focus
-```
-
-## 📁 Dosya Yapısı
+## 🏗️ Mimari
 
 ```
-Windows/
-├── main.py           # Ana giriş noktası ve CLI
-├── config.py         # Konfigürasyon yönetimi
-├── capture.py        # Ekran görüntüsü alma
-├── window.py         # Windows API pencere bilgisi
-├── analyzer.py       # Ollama AI analizi
-├── database.py       # SQLite veritabanı
-├── focus.py          # Odak takibi
-├── notifier.py       # Windows bildirimleri
-├── requirements.txt  # Python bağımlılıkları
-├── config.example.env # Örnek konfigürasyon
-├── install.bat       # Kurulum scripti
-└── run.bat          # Çalıştırma scripti
+HyprContext/
+├── backend/          # FastAPI Python backend
+│   ├── api/          # REST API endpoints
+│   ├── services/     # İş mantığı servisleri
+│   ├── models/       # Veri modelleri
+│   └── adapters/     # Harici servis adaptörleri (Ollama, ChromaDB)
+├── frontend/         # React + TypeScript + Electron
+│   ├── src/          # Uygulama kaynak kodu
+│   └── electron/     # Electron ana süreç
+├── docs/             # Dokümantasyon
+│   └── wiki/         # Wiki sayfaları
+└── Windows/          # Windows portu (ayrı branch)
 ```
 
-## ⚙️ Konfigürasyon Seçenekleri
+## 📖 Dokümantasyon
 
-| Değişken | Varsayılan | Açıklama |
-|----------|------------|----------|
-| `OLLAMA_URL` | `http://localhost:11434` | Ollama API adresi |
-| `MODEL_VISION` | `gemma3:4b` | Görüntü analiz modeli |
-| `CAPTURE_INTERVAL` | `20` | Screenshot aralığı (saniye) |
-| `FOCUS_DISTRACTION_THRESHOLD` | `300` | Dikkat dağınıklığı eşiği (saniye) |
-| `DATA_DIR` | `./data` | Veri dizini |
+| Sayfa | İçerik |
+|-------|--------|
+| [Wiki Ana Sayfa](docs/wiki/Home.md) | Genel bakış |
+| [Kurulum Rehberi](docs/wiki/Kurulum.md) | Detaylı kurulum |
+| [Kullanım Kılavuzu](docs/wiki/Kullanim-Kilavuzu.md) | Özellikler ve senaryolar |
+| [Yol Haritası](docs/wiki/Yol-Haritasi.md) | Proje geçmişi ve planlar |
+| [API Referansı](docs/wiki/API-Referansi.md) | Backend API docs |
 
-## 🔔 Bildirim Sistemi
+---
 
-- **Toast Bildirimi:** Windows 10/11 bildirim merkezi
-- **Sesli Uyarı:** Text-to-Speech ile sesli bildirim
-- **Dikkat Uyarısı:** 5 dakika+ dikkat dağınıklığında uyarı
+## 🖥️ Platform Desteği
 
-## 🗄️ Veritabanı
+| Platform | Durum | Açıklama |
+|----------|-------|----------|
+| 🐧 **Linux (Hyprland)** | ✅ Tam Destek | Ana platform, AppImage mevcut |
+| 🐧 **Linux (Diğer WM)** | ✅ Destekleniyor | Wayland WM'ler için çalışır |
+| 🪟 **Windows** | 🔄 Geliştiriliyor | [Windows Kurulum Rehberi](Windows/README.md) |
 
-SQLite veritabanı `data/memories.db` konumunda oluşturulur:
+---
 
-```sql
--- Aktivite kayıtları
-memories (
-    id, timestamp, screenshot_path,
-    active_window, all_windows, 
-    analysis, tags
-)
+## 🛠️ Geliştirme
 
--- Odak istatistikleri
-focus_stats (
-    id, date, total_time, 
-    distracted_time, productive_apps
-)
+### Gereksinimler
+
+- Python 3.11+
+- Node.js 18+
+- pnpm
+
+### Geliştirme Ortamı
+
+```bash
+# Backend
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+
+# Frontend
+cd frontend
+pnpm install
+pnpm dev
 ```
 
-## 🐛 Sorun Giderme
+---
 
-### Ollama bağlantı hatası
-```powershell
-# Ollama'nın çalıştığından emin olun
-ollama serve
-```
+## 🤝 Katkıda Bulunma
 
-### Ekran görüntüsü alınamıyor
-- Yönetici olarak çalıştırın
-- Antivirüs yazılımını kontrol edin
+1. Fork'layın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Commit'leyin (`git commit -m 'feat: amazing feature'`)
+4. Push'layın (`git push origin feature/amazing-feature`)
+5. Pull Request açın
 
-### Pencere bilgisi alınamıyor
-- `pywin32` paketinin kurulu olduğundan emin olun
+---
 
 ## 📄 Lisans
 
-MIT License - Detaylar için `LICENSE` dosyasına bakın.
+MIT License - Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
-## 🔗 Diğer Versiyonlar
+---
 
-- **Linux (Hyprland):** `main` branch
-- **Rust Core:** `WRust/` klasörü
-- **Go Dashboard:** `WGo/` klasörü
+## 🔗 Bağlantılar
+
+- 📦 [Releases](https://github.com/ozhangebesoglu/HyprContext/releases)
+- 📚 [Wiki](https://github.com/ozhangebesoglu/HyprContext/wiki)
+- 🐛 [Issues](https://github.com/ozhangebesoglu/HyprContext/issues)
+
+---
+
+<p align="center">
+  <sub>Made with ❤️ for productivity enthusiasts</sub>
+</p>
