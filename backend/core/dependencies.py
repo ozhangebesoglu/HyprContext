@@ -79,7 +79,7 @@ def get_screenshot_capture() -> IScreenshotCapture:
     """Screenshot capture bağımlılığı."""
     from ..services.screenshot_service import ScreenshotService
     settings = get_settings()
-    return ScreenshotService(temp_path=settings.screenshot_temp_path)
+    return ScreenshotService(screenshots_dir=settings.screenshots_dir)
 
 
 @lru_cache()
