@@ -1,6 +1,6 @@
 {
   "name": "hyprcontext-desktop",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "HyprContext Desktop Application - Linux için akıllı üretkenlik takip uygulaması",
   "main": "electron/main.cjs",
   "author": {
