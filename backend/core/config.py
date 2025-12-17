@@ -65,10 +65,12 @@ class Settings(BaseSettings):
     }
     
     # Dinamik path'ler (data_path'e göre)
+    # Not: Bu property'ler her zaman self.data_path'e göre hesaplanır
+    # Böylece update_data_path() çağrıldığında otomatik güncellenir
+    
     @property
     def screenshots_dir(self) -> str:
-        return os.environ.get('HYPRCONTEXT_SCREENSHOTS_DIR', 
-                              str(Path(self.data_path) / 'screenshots'))
+        return str(Path(self.data_path) / 'screenshots')
     
     @property
     def screenshot_temp_path(self) -> str:
@@ -76,33 +78,27 @@ class Settings(BaseSettings):
     
     @property
     def chroma_db_path(self) -> str:
-        return os.environ.get('HYPRCONTEXT_CHROMA_DB_PATH',
-                              str(Path(self.data_path) / 'hafiza_db'))
+        return str(Path(self.data_path) / 'hafiza_db')
     
     @property
     def history_jsonl_path(self) -> str:
-        return os.environ.get('HYPRCONTEXT_HISTORY_JSONL_PATH',
-                              str(Path(self.data_path) / 'history.jsonl'))
+        return str(Path(self.data_path) / 'history.jsonl')
     
     @property
     def plans_dir(self) -> str:
-        return os.environ.get('HYPRCONTEXT_PLANS_DIR',
-                              str(Path(self.data_path) / 'planlar'))
+        return str(Path(self.data_path) / 'planlar')
     
     @property
     def reports_dir(self) -> str:
-        return os.environ.get('HYPRCONTEXT_REPORTS_DIR',
-                              str(Path(self.data_path) / 'raporlar'))
+        return str(Path(self.data_path) / 'raporlar')
     
     @property
     def profile_path(self) -> str:
-        return os.environ.get('HYPRCONTEXT_PROFILE_PATH',
-                              str(Path(self.data_path) / 'profile.yaml'))
+        return str(Path(self.data_path) / 'profile.yaml')
     
     @property
     def focus_data_path(self) -> str:
-        return os.environ.get('HYPRCONTEXT_FOCUS_DATA_PATH',
-                              str(Path(self.data_path) / 'focus_data.json'))
+        return str(Path(self.data_path) / 'focus_data.json')
     
     def get_profile(self) -> dict:
         """Kullanıcı profilini yükle."""
