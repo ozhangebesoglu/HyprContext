@@ -82,6 +82,8 @@ async def capture_loop():
                     active_window = window_capture.get_active_window()
                     all_windows = window_capture.get_all_windows()
                     
+                    logger.info(f"Pencere bilgisi: {active_window}")
+                    
                     # Kurs tespiti yap
                     course = course_detector.detect_course()
                     if course:
@@ -101,7 +103,8 @@ async def capture_loop():
                             timestamp=datetime.now(),
                             summary=analysis.summary,
                             tags=analysis.tags,
-                            active_window=active_window.app_class if active_window else None
+                            active_window=active_window.app_class if active_window else None,
+                            screenshot_path=result.screenshot_path
                         )
                         
                         activity_repo.save(activity)

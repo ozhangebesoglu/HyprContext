@@ -23,6 +23,7 @@ class CaptureResult:
     """Yakalama sonucu."""
     success: bool
     data: Optional[bytes] = None
+    screenshot_path: Optional[str] = None
     error_message: Optional[str] = None
     error_type: Optional[str] = None
 

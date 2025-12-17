@@ -67,7 +67,8 @@ class ScreenshotService(IScreenshotCapture):
             
             return CaptureResult(
                 success=True,
-                data=screenshot_data
+                data=screenshot_data,
+                screenshot_path=str(self.temp_path)
             )
             
         except FileNotFoundError:
