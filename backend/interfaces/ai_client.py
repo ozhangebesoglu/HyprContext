@@ -14,12 +14,13 @@ class IAIClient(ABC):
     """AI modeli için soyut interface."""
     
     @abstractmethod
-    def generate(self, prompt: str, image: Optional[bytes] = None) -> str:
+    def generate(self, prompt: str, image: Optional[bytes] = None, system_prompt: Optional[str] = None) -> str:
         """Prompt'a göre yanıt üret.
         
         Args:
             prompt: AI'a gönderilecek metin
             image: Opsiyonel görüntü (base64 encoded)
+            system_prompt: Opsiyonel sistem prompt'u
             
         Returns:
             AI'ın ürettiği yanıt

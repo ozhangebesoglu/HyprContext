@@ -35,12 +35,13 @@ class OllamaAdapter(IAIClient):
         self.embed_model = embed_model
         self.base_url = base_url
     
-    def generate(self, prompt: str, image: Optional[bytes] = None) -> str:
+    def generate(self, prompt: str, image: Optional[bytes] = None, system_prompt: Optional[str] = None) -> str:
         """Prompt'a göre yanıt üret.
         
         Args:
             prompt: AI'a gönderilecek metin
             image: Opsiyonel görüntü (base64 encoded)
+            system_prompt: Opsiyonel sistem prompt'u
             
         Returns:
             AI'ın ürettiği yanıt
@@ -49,7 +50,14 @@ class OllamaAdapter(IAIClient):
             kwargs = {
                 "model": self.model_name,
                 "prompt": prompt,
+                "options": {
+                    "temperature": 0.2,  # Daha tutarlı yanıtlar
+                    "num_predict": 200,  # Daha uzun yanıtlar
+                }
             }
+            
+            if system_prompt:
+                kwargs["system"] = system_prompt
             
             if image:
                 # Base64 bytes'ı string'e çevir
