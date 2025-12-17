@@ -28,35 +28,37 @@ const queryClient = new QueryClient({
   },
 });
 
-// Backend bağlantı kontrolü
+// Backend bağlantı kontrolü - sadece başlangıçta
 function BackendCheck({ children }: { children: React.ReactNode }) {
-  const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [status, setStatus] = useState<'checking' | 'connected'>('checking');
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    // Zaten bağlandıysa tekrar kontrol etme
+    if (status === 'connected') return;
+    
     const checkBackend = async () => {
       try {
         const res = await fetch('http://localhost:8000/health', { 
           method: 'GET',
-          signal: AbortSignal.timeout(3000)
+          signal: AbortSignal.timeout(5000)
         });
         if (res.ok) {
           setStatus('connected');
-          setRetryCount(0);
+          // Bağlandıktan sonra interval'i temizle
+          clearInterval(intervalRef);
         } else {
-          setStatus('disconnected');
           setRetryCount(prev => prev + 1);
         }
       } catch {
-        setStatus('disconnected');
         setRetryCount(prev => prev + 1);
       }
     };
     
     checkBackend();
-    const interval = setInterval(checkBackend, 2000);
-    return () => clearInterval(interval);
-  }, []);
+    const intervalRef = setInterval(checkBackend, 2000);
+    return () => clearInterval(intervalRef);
+  }, [status]);
 
   // Backend bağlanana kadar loading göster
   if (status !== 'connected') {
