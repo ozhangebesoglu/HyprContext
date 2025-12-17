@@ -4,11 +4,12 @@
  * Masaüstü uygulaması ana pencere yönetimi.
  */
 
-const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const http = require('http');
 const { spawn } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 
 let mainWindow = null;
 let tray = null;
@@ -19,6 +20,85 @@ let backendProcess = null;
 const isDev = !app.isPackaged;
 
 const API_BASE = 'http://localhost:8000/api';
+
+// --- Kullanıcı Ayarları Yönetimi ---
+
+const CONFIG_DIR = path.join(os.homedir(), '.config', 'hyprcontext');
+const CONFIG_FILE = path.join(CONFIG_DIR, 'settings.json');
+
+function ensureConfigDir() {
+  if (!fs.existsSync(CONFIG_DIR)) {
+    fs.mkdirSync(CONFIG_DIR, { recursive: true });
+  }
+}
+
+function loadUserConfig() {
+  ensureConfigDir();
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+    }
+  } catch (error) {
+    console.error('Config yüklenemedi:', error);
+  }
+  return null;
+}
+
+function saveUserConfig(config) {
+  ensureConfigDir();
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+}
+
+function getDefaultDataPath() {
+  // Varsayılan: ~/HyprContext veya ~/Documents/HyprContext
+  const documentsPath = path.join(os.homedir(), 'Documents');
+  if (fs.existsSync(documentsPath)) {
+    return path.join(documentsPath, 'HyprContext');
+  }
+  return path.join(os.homedir(), 'HyprContext');
+}
+
+function isFirstRun() {
+  const config = loadUserConfig();
+  return !config || !config.dataPath;
+}
+
+function getDataPath() {
+  const config = loadUserConfig();
+  return config?.dataPath || getDefaultDataPath();
+}
+
+function ensureDataFolders(dataPath) {
+  const folders = ['screenshots', 'planlar', 'raporlar', 'hafiza_db'];
+  
+  // Ana klasörü oluştur
+  if (!fs.existsSync(dataPath)) {
+    fs.mkdirSync(dataPath, { recursive: true });
+  }
+  
+  // Alt klasörleri oluştur
+  for (const folder of folders) {
+    const folderPath = path.join(dataPath, folder);
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
+  }
+  
+  // Boş profile.yaml oluştur (yoksa)
+  const profilePath = path.join(dataPath, 'profile.yaml');
+  if (!fs.existsSync(profilePath)) {
+    fs.writeFileSync(profilePath, `# HyprContext Kullanıcı Profili
+# Buraya kendi bilgilerinizi ekleyebilirsiniz
+
+name: ""
+occupation: ""
+interests: []
+goals: []
+`, 'utf-8');
+  }
+  
+  console.log('Veri klasörleri hazırlandı:', dataPath);
+}
 
 // --- Backend Yönetimi ---
 
@@ -53,9 +133,16 @@ function getBackendPath() {
 
 async function startBackend() {
   const backendPath = getBackendPath();
+  const dataPath = getDataPath();
+  
+  // Veri klasörlerini oluştur
+  ensureDataFolders(dataPath);
   
   if (isDev) {
     console.log('Dev modu: Backend manuel başlatılmalı (uvicorn backend.main:app --port 8000)');
+    console.log('Data path:', dataPath);
+    // Dev modunda da path'i backend'e gönder
+    await sendDataPathToBackend(dataPath);
     return true;
   }
   
@@ -65,11 +152,26 @@ async function startBackend() {
   }
   
   console.log('Backend başlatılıyor:', backendPath);
+  console.log('Data path:', dataPath);
   
   return new Promise((resolve) => {
+    // Environment variable ile data path'i gönder
+    const env = {
+      ...process.env,
+      HYPRCONTEXT_DATA_PATH: dataPath,
+      HYPRCONTEXT_SCREENSHOTS_DIR: path.join(dataPath, 'screenshots'),
+      HYPRCONTEXT_PLANS_DIR: path.join(dataPath, 'planlar'),
+      HYPRCONTEXT_REPORTS_DIR: path.join(dataPath, 'raporlar'),
+      HYPRCONTEXT_CHROMA_DB_PATH: path.join(dataPath, 'hafiza_db'),
+      HYPRCONTEXT_PROFILE_PATH: path.join(dataPath, 'profile.yaml'),
+      HYPRCONTEXT_HISTORY_JSONL_PATH: path.join(dataPath, 'history.jsonl'),
+      HYPRCONTEXT_FOCUS_DATA_PATH: path.join(dataPath, 'focus_data.json'),
+    };
+    
     backendProcess = spawn(backendPath, [], {
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
+      env: env,
     });
     
     backendProcess.stdout.on('data', (data) => {
@@ -416,3 +518,101 @@ ipcMain.handle('toggle-capture', async () => {
     return { success: false, error: error.message };
   }
 });
+
+// --- Setup IPC Handlers ---
+
+ipcMain.handle('setup:isFirstRun', () => {
+  return isFirstRun();
+});
+
+ipcMain.handle('setup:getDataPath', () => {
+  return getDataPath();
+});
+
+ipcMain.handle('setup:selectFolder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'HyprContext Veri Klasörünü Seçin',
+    defaultPath: getDefaultDataPath(),
+    properties: ['openDirectory', 'createDirectory'],
+    buttonLabel: 'Klasörü Seç',
+  });
+  
+  if (result.canceled || result.filePaths.length === 0) {
+    return null;
+  }
+  
+  // Seçilen klasörün içine HyprContext klasörü oluştur
+  const selectedPath = result.filePaths[0];
+  const hyprContextPath = selectedPath.endsWith('HyprContext') 
+    ? selectedPath 
+    : path.join(selectedPath, 'HyprContext');
+  
+  return hyprContextPath;
+});
+
+ipcMain.handle('setup:complete', async (event, dataPath) => {
+  try {
+    // Klasörleri oluştur
+    ensureDataFolders(dataPath);
+    
+    // Config'i kaydet
+    saveUserConfig({ dataPath, setupCompleted: true, setupDate: new Date().toISOString() });
+    
+    // Backend'e yeni path'i bildir
+    await sendDataPathToBackend(dataPath);
+    
+    console.log('Setup tamamlandı, data path:', dataPath);
+    return { success: true, dataPath };
+  } catch (error) {
+    console.error('Setup hatası:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('setup:openDataFolder', async () => {
+  const dataPath = getDataPath();
+  if (fs.existsSync(dataPath)) {
+    shell.openPath(dataPath);
+    return true;
+  }
+  return false;
+});
+
+// Backend'e data path'i bildir (API üzerinden)
+async function sendDataPathToBackend(dataPath) {
+  try {
+    const url = new URL(`${API_BASE}/config/data-path`);
+    const postData = JSON.stringify({ data_path: dataPath });
+    
+    return new Promise((resolve, reject) => {
+      const req = http.request({
+        hostname: url.hostname,
+        port: url.port,
+        path: url.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+        },
+      }, (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+          console.log('Backend data path güncellendi:', data);
+          resolve(true);
+        });
+      });
+      
+      req.on('error', (err) => {
+        console.error('Backend path güncellenemedi:', err.message);
+        resolve(false); // Hata olsa bile devam et
+      });
+      
+      req.write(postData);
+      req.end();
+    });
+  } catch (error) {
+    console.error('sendDataPathToBackend hatası:', error);
+    return false;
+  }
+}

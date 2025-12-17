@@ -281,7 +281,7 @@ export function SettingsPage() {
         </div>
 
         {/* Obsidian Settings */}
-        <div className="col-span-12">
+        <div className="col-span-12 lg:col-span-6">
           <GlassCard className="p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="stat-icon">
@@ -305,6 +305,42 @@ export function SettingsPage() {
               <p className="text-xs text-muted pl-3">
                 Plan ve raporları bu dizine .md dosyası olarak aktarabilirsiniz.
                 Örnek: ~/SecondBrain, ~/Documents/Obsidian
+              </p>
+            </div>
+          </GlassCard>
+        </div>
+
+        {/* Data Folder */}
+        <div className="col-span-12 lg:col-span-6">
+          <GlassCard className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="stat-icon">
+                <FolderOpen size={18} />
+              </div>
+              <h3 className="text-lg font-semibold text-primary">Veri Klasörü</h3>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-sm text-secondary">
+                Ekran görüntüleri, planlar, raporlar ve diğer verileriniz bu klasörde saklanır.
+              </p>
+              
+              <GlassButton
+                onClick={() => {
+                  if (window.electronAPI) {
+                    window.electronAPI.openDataFolder();
+                  }
+                }}
+                className="w-full"
+              >
+                <span className="flex items-center gap-2">
+                  <FolderOpen size={16} />
+                  Veri Klasörünü Aç
+                </span>
+              </GlassButton>
+              
+              <p className="text-xs text-muted">
+                İpucu: Bu klasörü yedeklemek verilerinizi korur.
               </p>
             </div>
           </GlassCard>

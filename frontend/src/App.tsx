@@ -13,6 +13,7 @@ import { GraphsPage } from './pages/GraphsPage';
 import { PlansPage } from './pages/PlansPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import SetupPage from './pages/SetupPage';
 import { NotificationToast } from './components/features/NotificationToast';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useTheme } from './hooks/useTheme';
@@ -86,11 +87,42 @@ function BackendCheck({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const [isFirstRun, setIsFirstRun] = useState<boolean | null>(null);
+  const [setupComplete, setSetupComplete] = useState(false);
+  
   // WebSocket bağlantısı
   useWebSocket();
   
   // Tema yönetimi
   const { theme } = useTheme();
+
+  // İlk çalıştırma kontrolü
+  useEffect(() => {
+    const checkFirstRun = async () => {
+      if (window.electronAPI) {
+        const firstRun = await window.electronAPI.isFirstRun();
+        setIsFirstRun(firstRun);
+      } else {
+        // Tarayıcıda çalışıyorsa (dev mode) ilk çalıştırma değil
+        setIsFirstRun(false);
+      }
+    };
+    checkFirstRun();
+  }, []);
+
+  // İlk çalıştırma kontrolü yapılıyor
+  if (isFirstRun === null) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // İlk çalıştırma - Setup ekranını göster
+  if (isFirstRun && !setupComplete) {
+    return <SetupPage onComplete={() => setSetupComplete(true)} />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

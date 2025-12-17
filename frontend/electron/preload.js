@@ -39,6 +39,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return ipcRenderer.invoke('file:export', { data, filename });
   },
   
+  // Setup / Configuration
+  isFirstRun: () => ipcRenderer.invoke('setup:isFirstRun'),
+  getDataPath: () => ipcRenderer.invoke('setup:getDataPath'),
+  selectDataFolder: () => ipcRenderer.invoke('setup:selectFolder'),
+  completeSetup: (dataPath) => ipcRenderer.invoke('setup:complete', dataPath),
+  openDataFolder: () => ipcRenderer.invoke('setup:openDataFolder'),
+  
   // Platform info
   platform: process.platform,
 });

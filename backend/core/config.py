@@ -15,12 +15,29 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
+def get_default_data_path() -> str:
+    """Varsayılan veri klasörü yolu."""
+    # Environment variable öncelikli
+    if os.environ.get('HYPRCONTEXT_DATA_PATH'):
+        return os.environ['HYPRCONTEXT_DATA_PATH']
+    
+    # Home dizininde Documents/HyprContext veya HyprContext
+    home = Path.home()
+    documents = home / 'Documents'
+    if documents.exists():
+        return str(documents / 'HyprContext')
+    return str(home / 'HyprContext')
+
+
 class Settings(BaseSettings):
     """Uygulama ayarları."""
     
     # Genel
     app_name: str = "HyprContext"
     debug: bool = False
+    
+    # Veri Klasörü (kullanıcının seçtiği)
+    data_path: str = Field(default_factory=get_default_data_path)
     
     # AI Model
     ollama_model: str = "gemma3"
@@ -29,34 +46,63 @@ class Settings(BaseSettings):
     
     # Capture
     screenshot_interval: int = 30  # saniye
-    screenshot_temp_path: str = "/tmp/hyprcontext_screenshot.png"
-    
-    # Veritabanı
-    chroma_db_path: str = "./hafiza_db"
-    history_jsonl_path: str = "./history.jsonl"
-    
-    # Dosya Yolları
-    plans_dir: str = "./planlar"
-    reports_dir: str = "./raporlar"
-    profile_path: str = "./profile.yaml"
-    
-    # Focus
-    daily_distraction_limit_seconds: int = 7200  # 2 saat
-    focus_data_path: str = "./focus_data.json"
-    banned_keywords: list[str] = Field(default_factory=lambda: [
-        "youtube", "twitter", "reddit", "tiktok", "instagram"
-    ])
     
     # API
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     cors_origins: list[str] = Field(default_factory=lambda: ["*"])
     
+    # Focus
+    daily_distraction_limit_seconds: int = 7200  # 2 saat
+    banned_keywords: list[str] = Field(default_factory=lambda: [
+        "youtube", "twitter", "reddit", "tiktok", "instagram"
+    ])
+    
     model_config = {
         "env_prefix": "HYPRCONTEXT_",
         "env_file": ".env",
         "extra": "ignore"
     }
+    
+    # Dinamik path'ler (data_path'e göre)
+    @property
+    def screenshots_dir(self) -> str:
+        return os.environ.get('HYPRCONTEXT_SCREENSHOTS_DIR', 
+                              str(Path(self.data_path) / 'screenshots'))
+    
+    @property
+    def screenshot_temp_path(self) -> str:
+        return str(Path(self.screenshots_dir) / 'current.png')
+    
+    @property
+    def chroma_db_path(self) -> str:
+        return os.environ.get('HYPRCONTEXT_CHROMA_DB_PATH',
+                              str(Path(self.data_path) / 'hafiza_db'))
+    
+    @property
+    def history_jsonl_path(self) -> str:
+        return os.environ.get('HYPRCONTEXT_HISTORY_JSONL_PATH',
+                              str(Path(self.data_path) / 'history.jsonl'))
+    
+    @property
+    def plans_dir(self) -> str:
+        return os.environ.get('HYPRCONTEXT_PLANS_DIR',
+                              str(Path(self.data_path) / 'planlar'))
+    
+    @property
+    def reports_dir(self) -> str:
+        return os.environ.get('HYPRCONTEXT_REPORTS_DIR',
+                              str(Path(self.data_path) / 'raporlar'))
+    
+    @property
+    def profile_path(self) -> str:
+        return os.environ.get('HYPRCONTEXT_PROFILE_PATH',
+                              str(Path(self.data_path) / 'profile.yaml'))
+    
+    @property
+    def focus_data_path(self) -> str:
+        return os.environ.get('HYPRCONTEXT_FOCUS_DATA_PATH',
+                              str(Path(self.data_path) / 'focus_data.json'))
     
     def get_profile(self) -> dict:
         """Kullanıcı profilini yükle."""
@@ -70,9 +116,30 @@ class Settings(BaseSettings):
                 return yaml.safe_load(f) or {}
         except Exception:
             return {}
+    
+    def update_data_path(self, new_path: str) -> None:
+        """Veri klasörü yolunu güncelle."""
+        self.data_path = new_path
+        # Klasörleri oluştur
+        for folder in ['screenshots', 'planlar', 'raporlar', 'hafiza_db']:
+            folder_path = Path(new_path) / folder
+            folder_path.mkdir(parents=True, exist_ok=True)
 
 
-@lru_cache()
+# Singleton settings instance
+_settings: Optional[Settings] = None
+
+
 def get_settings() -> Settings:
-    """Ayarları al (cached)."""
-    return Settings()
+    """Ayarları al (singleton)."""
+    global _settings
+    if _settings is None:
+        _settings = Settings()
+    return _settings
+
+
+def reload_settings() -> Settings:
+    """Ayarları yeniden yükle."""
+    global _settings
+    _settings = Settings()
+    return _settings

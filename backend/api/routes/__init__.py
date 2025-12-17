@@ -12,6 +12,7 @@ from .focus import router as focus_router
 from .chat import router as chat_router
 from .profile import router as profile_router
 from .control import router as control_router
+from .config import router as config_router
 
 __all__ = [
     "activities_router",
@@ -21,4 +22,5 @@ __all__ = [
     "chat_router",
     "profile_router",
     "control_router",
+    "config_router",
 ]

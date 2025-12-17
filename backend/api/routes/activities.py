@@ -22,6 +22,8 @@ class ActivityResponse(BaseModel):
     timestamp: str
     summary: str
     tags: list[str]
+    active_window: Optional[str] = None
+    screenshot_path: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -69,7 +71,9 @@ async def get_activities(
             id=act.id or "",
             timestamp=act.timestamp.isoformat(),
             summary=act.summary,
-            tags=act.tags
+            tags=act.tags,
+            active_window=act.active_window,
+            screenshot_path=act.screenshot_path
         )
         for act in activities
     ]
@@ -90,7 +94,9 @@ async def get_today_activities(
             id=act.id or "",
             timestamp=act.timestamp.isoformat(),
             summary=act.summary,
-            tags=act.tags
+            tags=act.tags,
+            active_window=act.active_window,
+            screenshot_path=act.screenshot_path
         )
         for act in activities
     ]
@@ -110,7 +116,9 @@ async def search_activities(
             id=act.id or "",
             timestamp=act.timestamp.isoformat() if act.timestamp else "",
             summary=act.summary,
-            tags=act.tags
+            tags=act.tags,
+            active_window=act.active_window,
+            screenshot_path=act.screenshot_path
         )
         for act in activities
     ]
@@ -140,5 +148,7 @@ async def get_activity(
         id=activity.id or "",
         timestamp=activity.timestamp.isoformat(),
         summary=activity.summary,
-        tags=activity.tags
+        tags=activity.tags,
+        active_window=activity.active_window,
+        screenshot_path=activity.screenshot_path
     )

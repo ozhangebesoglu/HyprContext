@@ -32,7 +32,8 @@ from .api.routes import (
     focus_router,
     chat_router,
     profile_router,
-    control_router
+    control_router,
+    config_router
 )
 from .api.websocket.handlers import (
     websocket_endpoint, 
@@ -273,6 +274,7 @@ app.include_router(focus_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(profile_router, prefix="/api")
 app.include_router(control_router, prefix="/api")
+app.include_router(config_router, prefix="/api")
 
 # WebSocket
 app.websocket("/ws")(websocket_endpoint)
