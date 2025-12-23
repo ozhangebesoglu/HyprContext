@@ -9,22 +9,34 @@ import { GlassCard } from '../components/glass/GlassCard';
 import { GlassButton } from '../components/ui/glass-button';
 import { GlassInput } from '../components/ui/glass-input';
 import { PageTransition } from '../components/layout/PageTransition';
-import { 
-  Settings, User, Shield, 
-  Save, Loader2, Plus, X, Clock, BookOpen, FolderOpen
+import {
+  Settings, User, Shield,
+  Save, Loader2, Plus, X, Clock, BookOpen, FolderOpen, RotateCcw, Trash2
 } from 'lucide-react';
+import {
+  useAddCourse, useDeleteCourse, useFocusReset, useFocusStats
+} from '../hooks/useApi';
 
+// Backend'den gelen profil yapısı
 interface Profile {
-  user: {
-    name: string;
-    profession: string;
+  isim: string;
+  meslek: string;
+  ulke: string;
+  sehir: string;
+  gun_baslangici: string;
+  gun_bitisi: string;
+  egitim_programi?: {
+    durum: Array<{ isim: string; durum: string; sure?: string; platform?: string }>;
   };
-  daily_limits: {
-    distraction_minutes: number;
-  };
-  banned_keywords: string[];
-  courses: Array<{ name: string; platform: string; progress: number }>;
+  yasak_kelimeler: string[];
   obsidian_vault?: string;
+}
+
+interface Course {
+  isim: string;
+  durum: string;
+  sure?: string;
+  platform?: string;
 }
 
 export function SettingsPage() {
@@ -32,6 +44,14 @@ export function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [newKeyword, setNewKeyword] = useState('');
+  const [newCourse, setNewCourse] = useState({ isim: '', platform: '', durum: 'Aktif' });
+  const [showCourseForm, setShowCourseForm] = useState(false);
+
+  // API Hooks
+  const addCourseMutation = useAddCourse();
+  const deleteCourseMutation = useDeleteCourse();
+  const focusResetMutation = useFocusReset();
+  const { data: focusStats } = useFocusStats();
 
   useEffect(() => {
     fetchProfile();
@@ -39,7 +59,7 @@ export function SettingsPage() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/profile');
+      const response = await fetch('http://localhost:8000/api/profile/');
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
@@ -53,10 +73,10 @@ export function SettingsPage() {
 
   const saveProfile = async () => {
     if (!profile) return;
-    
+
     setSaving(true);
     try {
-      await fetch('http://localhost:8000/api/profile', {
+      await fetch('http://localhost:8000/api/profile/', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profile),
@@ -70,22 +90,55 @@ export function SettingsPage() {
 
   const addBannedKeyword = () => {
     if (!newKeyword.trim() || !profile) return;
-    
+
     setProfile({
       ...profile,
-      banned_keywords: [...profile.banned_keywords, newKeyword.trim()],
+      yasak_kelimeler: [...(profile.yasak_kelimeler || []), newKeyword.trim()],
     });
     setNewKeyword('');
   };
 
   const removeBannedKeyword = (keyword: string) => {
     if (!profile) return;
-    
+
     setProfile({
       ...profile,
-      banned_keywords: profile.banned_keywords.filter(k => k !== keyword),
+      yasak_kelimeler: (profile.yasak_kelimeler || []).filter((k: string) => k !== keyword),
     });
   };
+
+  const addCourse = async () => {
+    if (!newCourse.isim.trim() || !newCourse.platform.trim()) return;
+
+    try {
+      await addCourseMutation.mutateAsync(newCourse);
+      setNewCourse({ isim: '', platform: '', durum: 'Aktif' });
+      setShowCourseForm(false);
+      fetchProfile();
+    } catch (error) {
+      console.error('Kurs eklenirken hata:', error);
+    }
+  };
+
+  const deleteCourse = async (courseName: string) => {
+    try {
+      await deleteCourseMutation.mutateAsync(courseName);
+      fetchProfile();
+    } catch (error) {
+      console.error('Kurs silinirken hata:', error);
+    }
+  };
+
+  const resetFocusStats = async () => {
+    try {
+      await focusResetMutation.mutateAsync();
+    } catch (error) {
+      console.error('Focus sıfırlanırken hata:', error);
+    }
+  };
+
+  // Kursları al
+  const courses: Course[] = profile?.egitim_programi?.durum || [];
 
   if (loading) {
     return (
@@ -109,7 +162,7 @@ export function SettingsPage() {
           </h1>
           <p className="text-secondary mt-1">Uygulama ve profil ayarları</p>
         </div>
-        
+
         <GlassButton onClick={saveProfile} disabled={saving} size="sm">
           <span className="flex items-center gap-2">
             {saving ? (
@@ -137,22 +190,32 @@ export function SettingsPage() {
               <GlassInput
                 label="İsim"
                 icon={<User size={18} />}
-                value={profile?.user?.name || ''}
+                value={profile?.isim || ''}
                 onChange={(e) => setProfile(profile ? {
                   ...profile,
-                  user: { ...profile.user, name: e.target.value }
+                  isim: e.target.value
                 } : null)}
                 placeholder="İsminizi girin..."
               />
-              
+
               <GlassInput
                 label="Meslek"
-                value={profile?.user?.profession || ''}
+                value={profile?.meslek || ''}
                 onChange={(e) => setProfile(profile ? {
                   ...profile,
-                  user: { ...profile.user, profession: e.target.value }
+                  meslek: e.target.value
                 } : null)}
                 placeholder="Mesleğinizi girin..."
+              />
+
+              <GlassInput
+                label="Şehir"
+                value={profile?.sehir || ''}
+                onChange={(e) => setProfile(profile ? {
+                  ...profile,
+                  sehir: e.target.value
+                } : null)}
+                placeholder="Şehrinizi girin..."
               />
             </div>
           </GlassCard>
@@ -165,26 +228,52 @@ export function SettingsPage() {
               <div className="stat-icon">
                 <Clock size={18} />
               </div>
-              <h3 className="text-lg font-semibold text-primary">Odak Ayarları</h3>
+              <h3 className="text-lg font-semibold text-primary">Odak Durumu</h3>
             </div>
 
             <div className="space-y-4">
-              <GlassInput
-                label="Günlük Dikkat Dağınıklığı Limiti (dakika)"
-                icon={<Clock size={18} />}
-                type="number"
-                value={profile?.daily_limits?.distraction_minutes || 120}
-                onChange={(e) => setProfile(profile ? {
-                  ...profile,
-                  daily_limits: { 
-                    ...profile.daily_limits, 
-                    distraction_minutes: parseInt(e.target.value) || 120 
-                  }
-                } : null)}
-              />
-              
+              {/* Güncel Odak Durumu */}
+              {focusStats && (
+                <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-secondary">Bugün Kullanılan:</span>
+                    <span className="text-sm font-medium text-primary">
+                      {focusStats.formatted_used || '0dk'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-secondary">Kalan:</span>
+                    <span className={`text-sm font-medium ${focusStats.limit_reached ? 'text-red-400' : 'text-green-400'}`}>
+                      {focusStats.formatted_remaining || '2s 0dk'}
+                    </span>
+                  </div>
+                  <div className="progress-bar h-2">
+                    <div
+                      className={`progress-fill h-full ${focusStats.percentage > 80 ? 'bg-red-500' : ''}`}
+                      style={{ width: `${Math.min(focusStats.percentage || 0, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Reset Butonu */}
+              <GlassButton
+                onClick={resetFocusStats}
+                disabled={focusResetMutation.isPending}
+                className="w-full"
+              >
+                <span className="flex items-center gap-2 justify-center">
+                  {focusResetMutation.isPending ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <RotateCcw size={16} />
+                  )}
+                  Günlük Sayacı Sıfırla
+                </span>
+              </GlassButton>
+
               <p className="text-xs text-muted pl-3">
-                Yasaklı uygulamalarda bu süreyi aştığınızda uyarı alırsınız.
+                Bu işlem bugünkü dikkat dağınıklığı süresini ve uyarıları sıfırlar.
               </p>
             </div>
           </GlassCard>
@@ -206,17 +295,17 @@ export function SettingsPage() {
                 <GlassInput
                   value={newKeyword}
                   onChange={(e) => setNewKeyword(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addBannedKeyword()}
+                  onKeyDown={(e) => e.key === 'Enter' && addBannedKeyword()}
                   placeholder="Yeni kelime ekle..."
                 />
                 <GlassButton onClick={addBannedKeyword} size="icon">
                   <Plus size={18} />
                 </GlassButton>
               </div>
-              
+
               {/* Keywords list */}
               <div className="flex flex-wrap gap-2 max-h-48 overflow-auto">
-                {profile?.banned_keywords?.map((keyword) => (
+                {(profile?.yasak_kelimeler || []).map((keyword: string) => (
                   <span
                     key={keyword}
                     className="tag flex items-center gap-2 group"
@@ -231,6 +320,10 @@ export function SettingsPage() {
                   </span>
                 ))}
               </div>
+
+              <p className="text-xs text-muted">
+                Bu kelimeleri içeren uygulamalar "dikkat dağınıklığı" olarak sayılır.
+              </p>
             </div>
           </GlassCard>
         </div>
@@ -238,37 +331,84 @@ export function SettingsPage() {
         {/* Courses */}
         <div className="col-span-12 lg:col-span-6">
           <GlassCard className="p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="stat-icon">
-                <BookOpen size={18} />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="stat-icon">
+                  <BookOpen size={18} />
+                </div>
+                <h3 className="text-lg font-semibold text-primary">Kurslar</h3>
               </div>
-              <h3 className="text-lg font-semibold text-primary">Kurslar</h3>
+              <GlassButton
+                size="icon"
+                onClick={() => setShowCourseForm(!showCourseForm)}
+              >
+                {showCourseForm ? <X size={16} /> : <Plus size={16} />}
+              </GlassButton>
             </div>
 
+            {/* Kurs Ekleme Formu */}
+            {showCourseForm && (
+              <div className="space-y-3 mb-4 p-4 rounded-lg bg-white/5 border border-white/10">
+                <GlassInput
+                  label="Kurs Adı"
+                  value={newCourse.isim}
+                  onChange={(e) => setNewCourse({ ...newCourse, isim: e.target.value })}
+                  placeholder="Örn: React Masterclass"
+                />
+                <GlassInput
+                  label="Platform"
+                  value={newCourse.platform}
+                  onChange={(e) => setNewCourse({ ...newCourse, platform: e.target.value })}
+                  placeholder="Örn: Udemy, Coursera"
+                />
+                <GlassButton
+                  onClick={addCourse}
+                  disabled={addCourseMutation.isPending}
+                  className="w-full"
+                >
+                  {addCourseMutation.isPending ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Plus size={16} />
+                      Kurs Ekle
+                    </span>
+                  )}
+                </GlassButton>
+              </div>
+            )}
+
             <div className="space-y-3 max-h-48 overflow-auto">
-              {profile?.courses?.length ? (
-                profile.courses.map((course, index) => (
+              {courses.length > 0 ? (
+                courses.map((course: Course, index: number) => (
                   <div
                     key={index}
-                    className="activity-item"
+                    className="activity-item group"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-primary font-medium">
-                        {course.name}
+                        {course.isim}
                       </span>
-                      <span className="text-xs text-muted">
-                        {course.progress}%
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          course.durum?.includes('Tamamlandı') ? 'bg-green-500/20 text-green-400' :
+                          course.durum?.includes('Aktif') ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {course.durum}
+                        </span>
+                        <button
+                          onClick={() => deleteCourse(course.isim)}
+                          disabled={deleteCourseMutation.isPending}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-500"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
-                    <span className="text-xs text-muted">{course.platform}</span>
-                    
-                    {/* Progress bar */}
-                    <div className="progress-bar h-1.5 mt-2">
-                      <div
-                        className="progress-fill h-full"
-                        style={{ width: `${course.progress}%` }}
-                      />
-                    </div>
+                    {course.sure && (
+                      <span className="text-xs text-muted">{course.sure}</span>
+                    )}
                   </div>
                 ))
               ) : (
@@ -301,7 +441,7 @@ export function SettingsPage() {
                 } : null)}
                 placeholder="~/SecondBrain veya tam dizin yolu..."
               />
-              
+
               <p className="text-xs text-muted pl-3">
                 Plan ve raporları bu dizine .md dosyası olarak aktarabilirsiniz.
                 Örnek: ~/SecondBrain, ~/Documents/Obsidian
@@ -324,7 +464,7 @@ export function SettingsPage() {
               <p className="text-sm text-secondary">
                 Ekran görüntüleri, planlar, raporlar ve diğer verileriniz bu klasörde saklanır.
               </p>
-              
+
               <GlassButton
                 onClick={() => {
                   if (window.electronAPI) {
@@ -338,7 +478,7 @@ export function SettingsPage() {
                   Veri Klasörünü Aç
                 </span>
               </GlassButton>
-              
+
               <p className="text-xs text-muted">
                 İpucu: Bu klasörü yedeklemek verilerinizi korur.
               </p>
@@ -350,7 +490,3 @@ export function SettingsPage() {
     </PageTransition>
   );
 }
-
-
-
-

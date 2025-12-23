@@ -219,7 +219,7 @@ export function useStartCapture() {
 
 export function useStopCapture() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () =>
       fetchApi('/control/stop', {
@@ -229,4 +229,166 @@ export function useStopCapture() {
       queryClient.invalidateQueries({ queryKey: ['control', 'status'] });
     },
   });
+}
+
+export function useRestartCapture() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () =>
+      fetchApi('/control/restart', {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['control', 'status'] });
+    },
+  });
+}
+
+// Profile - Courses
+export interface Course {
+  isim: string;
+  durum: string;
+  sure?: string;
+  platform?: string;
+}
+
+export function useCourses() {
+  return useQuery<{ courses: Course[] }>({
+    queryKey: ['profile', 'courses'],
+    queryFn: () => fetchApi<{ courses: Course[] }>('/profile/courses'),
+  });
+}
+
+export function useAddCourse() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (course: { isim: string; platform: string; durum?: string }) =>
+      fetchApi('/profile/courses', {
+        method: 'POST',
+        body: JSON.stringify(course),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', 'courses'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+}
+
+export function useDeleteCourse() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (courseName: string) =>
+      fetchApi(`/profile/courses/${encodeURIComponent(courseName)}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', 'courses'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+}
+
+// Profile - Banned Keywords
+export function useBannedKeywords() {
+  return useQuery<string[]>({
+    queryKey: ['profile', 'banned-keywords'],
+    queryFn: () => fetchApi<string[]>('/profile/banned-keywords'),
+  });
+}
+
+export function useUpdateBannedKeywords() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (keywords: string[]) =>
+      fetchApi('/profile/banned-keywords', {
+        method: 'PUT',
+        body: JSON.stringify({ keywords }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', 'banned-keywords'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+}
+
+// Focus - Reset
+export function useFocusReset() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () =>
+      fetchApi('/focus/reset', {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['focus'] });
+    },
+  });
+}
+
+// Config - Data Path
+export interface ConfigDataPath {
+  data_path: string;
+  screenshots_dir: string;
+  plans_dir: string;
+  reports_dir: string;
+  chroma_db_path: string;
+}
+
+export function useConfigDataPath() {
+  return useQuery<ConfigDataPath>({
+    queryKey: ['config', 'data-path'],
+    queryFn: () => fetchApi<ConfigDataPath>('/config/data-path'),
+  });
+}
+
+export function useUpdateConfigDataPath() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dataPath: string) =>
+      fetchApi('/config/data-path', {
+        method: 'POST',
+        body: JSON.stringify({ data_path: dataPath }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['config'] });
+    },
+  });
+}
+
+// Chat - Streaming
+export function useChatStream() {
+  return {
+    streamChat: async function* (data: { message: string; context?: string; include_memory?: boolean }) {
+      const response = await fetch(`${API_BASE}/chat/stream`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Stream başlatılamadı');
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('Stream okunamadı');
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        yield chunk;
+      }
+    },
+  };
 }
