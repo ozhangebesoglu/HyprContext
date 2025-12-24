@@ -1,277 +1,450 @@
-# 🧠 HyprContext
+<p align="center">
+  <img src="../docs/screenshots/App_Photos/anasayfa.png" alt="HyprContext Windows" width="500">
+</p>
 
-**Kişisel AI Hafıza Ajanı** - Ekranınızı analiz eden, aktivitelerinizi kaydeden ve size özel içgörüler sunan yerel yapay zeka asistanı.
+<h1 align="center">HyprContext - Windows Edition</h1>
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![Ollama](https://img.shields.io/badge/Ollama-Local_AI-green)
-![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-purple)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+<p align="center">
+  <strong>Screen Activity Monitoring and AI Analysis Tool for Windows</strong>
+</p>
 
-## 📸 Ekran Görüntüleri
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/python-3.10+-green?style=for-the-badge" alt="Python">
+  <img src="https://img.shields.io/badge/AI-Ollama-purple?style=for-the-badge" alt="Ollama">
+  <img src="https://img.shields.io/badge/status-In%20Development-orange?style=for-the-badge" alt="Status">
+</p>
+
+<p align="center">
+  <a href="#english">English</a> | <a href="#türkçe">Türkçe</a>
+</p>
+
+---
+
+# English
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **Screen Capture** | Automatic screenshot using Windows API (mss) |
+| **Window Tracking** | Monitor active and background windows |
+| **AI Analysis** | Smart activity interpretation with Ollama |
+| **Focus Tracking** | Distraction warnings and time limits |
+| **Database** | Local SQLite storage |
+| **Notifications** | Windows toast notifications and audio alerts |
+
+## Screenshots
 
 <details>
-<summary>🖥️ Canlı Dashboard</summary>
+<summary><strong>Show Screenshots</strong></summary>
 
-![Dashboard](docs/screenshots/dashboard.jpeg)
+| Home Page | Graphs |
+|-----------|--------|
+| ![Home](../docs/screenshots/App_Photos/anasayfa.png) | ![Graphs](../docs/screenshots/App_Photos/grafikler.png) |
+
+| Plans | Reports |
+|-------|---------|
+| ![Plans](../docs/screenshots/App_Photos/planlar.png) | ![Reports](../docs/screenshots/App_Photos/raporlar.png) |
+
+| Live Activity | Settings |
+|---------------|----------|
+| ![Live](../docs/screenshots/App_Photos/canliaktivite.png) | ![Settings](../docs/screenshots/App_Photos/ayarlar.png) |
 
 </details>
 
-<details>
-<summary>📅 Günlük Plan (Obsidian)</summary>
+---
 
-![Plan](docs/screenshots/plan_obsidian.jpeg)
+## Requirements
 
-</details>
+| Requirement | Version |
+|-------------|---------|
+| Windows | 10 / 11 |
+| Python | 3.10+ |
+| Ollama | Latest |
 
-<details>
-<summary>📝 Günlük Rapor (Obsidian)</summary>
+---
 
-![Report](docs/screenshots/rapor_obsidian.jpeg)
+## Installation
 
-</details>
+### 1. Install Ollama
 
-<details>
-<summary>💬 Hafıza Sohbeti</summary>
-
-![Chat](docs/screenshots/chat.jpeg)
-
-</details>
-
-<details>
-<summary>⚡ Nasıl Çalışır (Loglar)</summary>
-
-![Logs](docs/screenshots/nasilcalisir.jpeg)
-
-</details>
-
-<details>
-<summary>🎯 Plan Oluşturma (Terminal)</summary>
-
-![Plan Terminal](docs/screenshots/planterminal.jpeg)
-
-</details>
-
-<details>
-<summary>📊 Rapor Oluşturma (Terminal)</summary>
-
-![Report Terminal](docs/screenshots/raporterminal.jpeg)
-
-</details>
-
-<details>
-<summary>🖥️ GPU Kullanımı</summary>
-
-![GPU](docs/screenshots/watchGPU.jpeg)
-
-</details>
-
-## ✨ Özellikler
-
-- 🖥️ **Ekran Analizi**: Periyodik ekran görüntüsü alıp AI ile analiz eder
-- 🧠 **Vektör Hafıza**: ChromaDB ile semantik arama yapılabilir hafıza
-- 📊 **Dashboard**: Terminal ve web tabanlı aktivite takibi
-- 📅 **Günlük Planlama**: Geçmiş aktivitelere dayalı kişiselleştirilmiş günlük plan
-- 📝 **Günlük Rapor**: Gün sonu aktivite özeti ve verimlilik analizi
-- 💬 **Hafıza Sohbeti**: Geçmiş aktiviteleriniz hakkında soru sorun
-- 🚨 **Odak Bekçisi**: Dikkat dağıtıcı aktiviteleri tespit edip uyarı verir
-
-## 🏗️ Mimari
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   grim      │────▶│   Gemma3    │────▶│  ChromaDB   │
-│ (screenshot)│     │  (analiz)   │     │  (hafıza)   │
-└─────────────┘     └─────────────┘     └─────────────┘
-                           │
-                           ▼
-              ┌─────────────────────────┐
-              │   Dashboard / Rapor     │
-              │   Planner / Chat        │
-              └─────────────────────────┘
-```
-
-## 📦 Gereksinimler
-
-### Sistem
-- Linux (Arch Linux önerilir)
-- Hyprland (Wayland compositor)
-- [Ollama](https://ollama.ai/) kurulu ve çalışır durumda
-
-### Ollama Modelleri
-```bash
+```powershell
+# Download Ollama from https://ollama.ai
+# After installation, pull the model:
 ollama pull gemma3
 ollama pull mxbai-embed-large
 ```
 
-## 🚀 Kurulum
+### 2. Project Setup
 
-### 1. Repoyu klonla
-```bash
-git clone https://github.com/kullanici/HyprContext.git
+```powershell
+# Clone repository
+git clone https://github.com/ozhangebesoglu/HyprContext.git
 cd HyprContext
+git checkout windows
+cd Windows
+
+# Run install script
+install.bat
 ```
 
-### 2. Sanal ortam oluştur
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+### 3. Configuration
+
+```powershell
+# Create .env file
+copy config.example.env .env
+
+# Edit .env file (optional)
+notepad .env
+```
+
+---
+
+## Usage
+
+### Start Daemon (Main Mode)
+
+```powershell
+# Activate and run
+run.bat
+
+# Or manually:
+venv\Scripts\activate
+python main.py run
+```
+
+### CLI Commands
+
+```powershell
+# Single capture
+python main.py capture
+
+# View stats
+python main.py stats
+
+# List recent activities
+python main.py recent --count 10
+
+# Search activities
+python main.py search "Visual Studio"
+
+# Show focus status
+python main.py focus
+
+# Show version
+python main.py version
+```
+
+---
+
+## Project Structure
+
+```
+Windows/
+├── main.py           # Entry point and CLI (Typer)
+├── config.py         # Configuration management (Pydantic)
+├── capture.py        # Screen capture (mss + PIL)
+├── window.py         # Windows API window info
+├── analyzer.py       # Ollama AI analysis
+├── database.py       # SQLite database
+├── focus.py          # Focus tracking
+├── notifier.py       # Windows notifications
+├── requirements.txt  # Python dependencies
+├── install.bat       # Installation script
+└── run.bat           # Run script
+```
+
+---
+
+## Configuration Options
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OLLAMA_URL` | `http://localhost:11434` | Ollama API address |
+| `MODEL_VISION` | `gemma3` | Vision analysis model |
+| `MODEL_EMBED` | `mxbai-embed-large` | Embedding model |
+| `CAPTURE_INTERVAL` | `20` | Screenshot interval (seconds) |
+| `DISTRACTION_THRESHOLD` | `3` | Distraction warning threshold |
+| `DAILY_DISTRACTION_LIMIT` | `1800` | Daily distraction limit (seconds) |
+
+---
+
+## Architecture Comparison
+
+| Component | Linux (Main) | Windows |
+|-----------|--------------|---------|
+| Backend | FastAPI + REST API | CLI (Typer) |
+| Database | ChromaDB (Vector) | SQLite |
+| Screenshots | grim (Wayland) | mss (Windows API) |
+| Notifications | libnotify | win10toast |
+| UI | Electron + React | CLI only (GUI planned) |
+
+---
+
+## Notification System
+
+| Type | Description |
+|------|-------------|
+| **Toast Notification** | Windows 10/11 notification center |
+| **Audio Alert** | Text-to-Speech voice notification |
+| **Distraction Warning** | Alert after 5+ minutes of distraction |
+
+---
+
+## Troubleshooting
+
+### Ollama connection error
+
+```powershell
+# Make sure Ollama is running
+ollama serve
+```
+
+### Screenshot not working
+
+- Run as Administrator
+- Check antivirus software
+
+### Window info not available
+
+```powershell
+# Make sure pywin32 is installed
+pip install pywin32
+```
+
+---
+
+## Other Platforms
+
+| Platform | Status | Link |
+|----------|--------|------|
+| Linux (Hyprland) | Full Support | [Main README](../README.md) |
+| Rust Core | Experimental | [WRust/](../WRust/README.md) |
+| Go Dashboard | Experimental | [WGo/](../WGo/README.md) |
+
+---
+
+# Türkçe
+
+## Özellikler
+
+| Özellik | Açıklama |
+|---------|----------|
+| **Ekran Görüntüsü** | Windows API ile otomatik screenshot (mss) |
+| **Pencere Takibi** | Aktif ve arka plan pencerelerini izleme |
+| **AI Analiz** | Ollama ile akıllı aktivite yorumlama |
+| **Odak Takibi** | Dikkat dağınıklığı uyarıları ve zaman limitleri |
+| **Veritabanı** | SQLite ile yerel kayıt |
+| **Bildirimler** | Windows toast bildirimleri ve sesli uyarı |
+
+## Ekran Görüntüleri
+
+<details>
+<summary><strong>Görüntüleri Göster</strong></summary>
+
+| Ana Sayfa | Grafikler |
+|-----------|-----------|
+| ![Ana Sayfa](../docs/screenshots/App_Photos/anasayfa.png) | ![Grafikler](../docs/screenshots/App_Photos/grafikler.png) |
+
+| Planlar | Raporlar |
+|---------|----------|
+| ![Planlar](../docs/screenshots/App_Photos/planlar.png) | ![Raporlar](../docs/screenshots/App_Photos/raporlar.png) |
+
+| Canlı Aktivite | Ayarlar |
+|----------------|---------|
+| ![Canlı](../docs/screenshots/App_Photos/canliaktivite.png) | ![Ayarlar](../docs/screenshots/App_Photos/ayarlar.png) |
+
+</details>
+
+---
+
+## Gereksinimler
+
+| Gereksinim | Versiyon |
+|------------|----------|
+| Windows | 10 / 11 |
+| Python | 3.10+ |
+| Ollama | En son |
+
+---
+
+## Kurulum
+
+### 1. Ollama Kurulumu
+
+```powershell
+# Ollama'yı https://ollama.ai adresinden indirin
+# Kurulumdan sonra modeli indirin:
+ollama pull gemma3
+ollama pull mxbai-embed-large
+```
+
+### 2. Proje Kurulumu
+
+```powershell
+# Repo'yu klonlayın
+git clone https://github.com/ozhangebesoglu/HyprContext.git
+cd HyprContext
+git checkout windows
+cd Windows
+
+# Kurulum scriptini çalıştırın
+install.bat
 ```
 
 ### 3. Konfigürasyon
-```bash
-# .env dosyasını oluştur
-cp .env.example .env
-nano .env  # Ayarları düzenle
 
-# Profil dosyasını oluştur
-cp profile.yaml.example profile.yaml
-nano profile.yaml  # Kendi bilgilerinizi girin
+```powershell
+# .env dosyası oluşturun
+copy config.example.env .env
+
+# .env dosyasını düzenleyin (opsiyonel)
+notepad .env
 ```
 
-### 4. Sistem araçları (Arch Linux)
-```bash
-sudo pacman -S grim libnotify
+---
+
+## Kullanım
+
+### Daemon Başlatma (Ana Mod)
+
+```powershell
+# Aktivasyon ve çalıştırma
+run.bat
+
+# Veya manuel:
+venv\Scripts\activate
+python main.py run
 ```
 
-## 🎮 Kullanım
+### CLI Komutları
 
-### Ana Servis (Ekran İzleme)
-```bash
-python main.py
+```powershell
+# Tek seferlik ekran yakalama
+python main.py capture
+
+# İstatistikleri görüntüle
+python main.py stats
+
+# Son aktiviteleri listele
+python main.py recent --count 10
+
+# Aktivitelerde arama
+python main.py search "Visual Studio"
+
+# Odak durumunu göster
+python main.py focus
+
+# Versiyon bilgisi
+python main.py version
 ```
 
-### Terminal Dashboard
-```bash
-python dashboard.py
-```
+---
 
-### Web Dashboard
-```bash
-streamlit run web_dashboard.py
-```
-
-### Günlük Plan Oluştur
-```bash
-python planner.py
-# veya not ekleyerek:
-python planner.py "Bugün React öğreneceğim"
-```
-
-### Günlük Rapor
-```bash
-python daily_report.py
-```
-
-### Hafıza Sohbeti
-```bash
-python chat.py
-```
-
-## ⌨️ Shell Alias'ları (Önerilen)
-
-`.bashrc` veya `.zshrc` dosyasına ekleyin:
-
-```bash
-# HyprContext Kısayolları
-alias baslat="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/main.py"
-alias chat="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/chat.py"
-alias rapor="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/daily_report.py"
-alias plan="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/planner.py"
-alias dashboard="/path/to/HyprContext/venv/bin/python /path/to/HyprContext/dashboard.py"
-```
-
-Sonra:
-```bash
-source ~/.zshrc  # veya ~/.bashrc
-```
-
-Artık sadece `baslat`, `chat`, `rapor`, `plan`, `dashboard` yazarak kullanabilirsiniz!
-
-## ⚙️ Systemd Servisi (Opsiyonel)
-
-Arka planda otomatik çalışması için:
-
-```bash
-# ~/.config/systemd/user/hyprcontext.service
-[Unit]
-Description=HyprContext AI Memory Agent
-After=graphical-session.target
-
-[Service]
-Type=simple
-WorkingDirectory=/path/to/HyprContext
-ExecStart=/path/to/HyprContext/venv/bin/python main.py
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=default.target
-```
-
-```bash
-systemctl --user enable hyprcontext
-systemctl --user start hyprcontext
-```
-
-## 📁 Dosya Yapısı
+## Dosya Yapısı
 
 ```
-HyprContext/
-├── main.py              # Ana izleme servisi
-├── dashboard.py         # Terminal UI
-├── web_dashboard.py     # Streamlit web UI
-├── planner.py           # Günlük plan oluşturucu
-├── daily_report.py      # Günlük rapor oluşturucu
-├── chat.py              # Hafıza sohbeti
-├── config.py            # Merkezi konfigürasyon
-├── database.py          # ChromaDB işlemleri
-├── window_utils.py      # Hyprland yardımcıları
-├── .env.example         # Örnek konfigürasyon
-├── profile.yaml.example # Örnek kullanıcı profili
-└── requirements.txt     # Python bağımlılıkları
+Windows/
+├── main.py           # Ana giriş noktası ve CLI (Typer)
+├── config.py         # Konfigürasyon yönetimi (Pydantic)
+├── capture.py        # Ekran görüntüsü alma (mss + PIL)
+├── window.py         # Windows API pencere bilgisi
+├── analyzer.py       # Ollama AI analizi
+├── database.py       # SQLite veritabanı
+├── focus.py          # Odak takibi
+├── notifier.py       # Windows bildirimleri
+├── requirements.txt  # Python bağımlılıkları
+├── install.bat       # Kurulum scripti
+└── run.bat           # Çalıştırma scripti
 ```
 
-## 🔧 Konfigürasyon
+---
 
-### .env Dosyası
-```env
-# Modeller
-MODEL_VISION=gemma3
-MODEL_EMBED=mxbai-embed-large
+## Konfigürasyon Seçenekleri
 
-# Zamanlama
-CAPTURE_INTERVAL=20  # saniye
+| Değişken | Varsayılan | Açıklama |
+|----------|------------|----------|
+| `OLLAMA_URL` | `http://localhost:11434` | Ollama API adresi |
+| `MODEL_VISION` | `gemma3` | Görüntü analiz modeli |
+| `MODEL_EMBED` | `mxbai-embed-large` | Embedding modeli |
+| `CAPTURE_INTERVAL` | `20` | Screenshot aralığı (saniye) |
+| `DISTRACTION_THRESHOLD` | `3` | Dikkat dağınıklığı eşiği |
+| `DAILY_DISTRACTION_LIMIT` | `1800` | Günlük dikkat dağıtıcı limiti (saniye) |
 
-# Odak Bekçisi
-YASAKLI_KELIMELER=youtube,instagram,twitter,reddit,oyun,netflix
-DISTRACTION_THRESHOLD=3
+---
 
-# Hava Durumu
-WEATHER_CITY=Istanbul
+## Mimari Karşılaştırması
+
+| Bileşen | Linux (Ana) | Windows |
+|---------|-------------|---------|
+| Backend | FastAPI + REST API | CLI (Typer) |
+| Veritabanı | ChromaDB (Vektör) | SQLite |
+| Ekran Görüntüsü | grim (Wayland) | mss (Windows API) |
+| Bildirimler | libnotify | win10toast |
+| UI | Electron + React | Sadece CLI (GUI planlanıyor) |
+
+---
+
+## Bildirim Sistemi
+
+| Tür | Açıklama |
+|-----|----------|
+| **Toast Bildirimi** | Windows 10/11 bildirim merkezi |
+| **Sesli Uyarı** | Text-to-Speech ile sesli bildirim |
+| **Dikkat Uyarısı** | 5+ dakika dikkat dağınıklığında uyarı |
+
+---
+
+## Sorun Giderme
+
+### Ollama bağlantı hatası
+
+```powershell
+# Ollama'nın çalıştığından emin olun
+ollama serve
 ```
 
-### profile.yaml
-Planner ve diğer modüller için kullanıcı profili. Eğitim programı, projeler, hedefler gibi bilgiler içerir.
+### Ekran görüntüsü alınamıyor
 
-## 🔒 Gizlilik
+- Yönetici olarak çalıştırın
+- Antivirüs yazılımını kontrol edin
 
-- Tüm veriler **yerel** olarak saklanır
-- Hiçbir veri internete gönderilmez
-- Ollama modelleri yerel çalışır
-- Kişisel dosyalar `.gitignore`'da
+### Pencere bilgisi alınamıyor
 
-## 📄 Lisans
+```powershell
+# pywin32 paketinin kurulu olduğundan emin olun
+pip install pywin32
+```
 
-MIT License
+---
 
-## 🤝 Katkıda Bulunma
+## Diğer Platformlar
 
-Pull request'ler memnuniyetle karşılanır!
+| Platform | Durum | Link |
+|----------|-------|------|
+| Linux (Hyprland) | Tam Destek | [Ana README](../README.md) |
+| Rust Core | Deneysel | [WRust/](../WRust/README.md) |
+| Go Dashboard | Deneysel | [WGo/](../WGo/README.md) |
 
-1. Fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing`)
-3. Commit edin (`git commit -m 'Add amazing feature'`)
-4. Push edin (`git push origin feature/amazing`)
-5. Pull Request açın
+---
 
+## Roadmap / Yol Haritası
+
+- [ ] FastAPI backend integration / FastAPI backend entegrasyonu
+- [ ] Electron + React GUI / Electron + React arayüzü
+- [ ] ChromaDB vector database / ChromaDB vektör veritabanı
+- [ ] WebSocket real-time updates / WebSocket gerçek zamanlı güncellemeler
+- [ ] System tray integration / Sistem tepsisi entegrasyonu
+
+---
+
+## License / Lisans
+
+MIT License - See [LICENSE](../LICENSE) file for details.
+
+---
+
+<p align="center">
+  <sub>Windows port - HyprContext project</sub>
+</p>
